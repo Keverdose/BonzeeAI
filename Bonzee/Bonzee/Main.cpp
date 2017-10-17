@@ -9,6 +9,8 @@ using std::string;
 
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
+static const int ROW_LENGTH = 9;
+static const int COL_LENGTH = 5;
 static const enum Color { R = 'R', G = 'G', E = ' ' };
 
 /* BOARD LAYOUT:
@@ -49,36 +51,31 @@ int main(){
 	cin.get();
 }
 
+// Function to Print Current Board Configuration
 void PrintBoard(){
-	cout << "     1   2   3   4   5   6   7   8   9" << endl;
-	for (auto i = 0; i < MAX_BOARD_SIZE; i++){
-		if (i % 9 != 0){
-			cout << char(board[i]) << " | ";
+
+	cout << " ============================================================ " << endl;
+	cout << "\n       1     2     3     4     5     6     7     8     9";
+
+	char startLetter = 'A';
+
+	for (auto i = 0; i < MAX_BOARD_SIZE; i++) {
+		
+		// Prints the Line Letter
+		if (i % ROW_LENGTH == 0) {
+			cout << "\n\n  " << (char)(startLetter + (i / ROW_LENGTH)) << " ";
 		}
-		else{
-			if (i == 0){
-				cout << "A: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 9){
-				cout << endl << "B: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 18){
-				cout << endl << "C: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 27){
-				cout << endl << "D: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 36){
-				cout << endl << "E: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-		}
+
+		// Prints Content of the Line 
+		if (i % 2 == 0)
+			cout << " [ " << (char)board[i] << " ]";
+		else
+			cout << " ( " << (char)board[i] << " )";
+		
 	}
-	cout << endl;
+
+	cout << "\n\n ============================================================\n" << endl;
+
 }
 
 void ProcessMoveRequest(){
