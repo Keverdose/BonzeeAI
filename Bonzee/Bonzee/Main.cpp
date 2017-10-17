@@ -10,11 +10,8 @@ using std::string;
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
 static const int ROW_LENGTH = 9;
-<<<<<<< HEAD
 static const int COLUMN_LENGTH = 5;
-=======
-static const int COL_LENGTH = 5;
->>>>>>> d814d389348f5e92134a7f2a5e0ddc12c4ad7e01
+
 static const enum Color { R = 'R', G = 'G', E = ' ' };
 static bool player = true;
 
@@ -56,35 +53,6 @@ int main() {
 	cin.get();
 }
 
-<<<<<<< HEAD
-void PrintBoard() {
-	cout << "     1   2   3   4   5   6   7   8   9" << endl;
-	for (auto i = 0; i < MAX_BOARD_SIZE; i++) {
-		if (i % 9 != 0) {
-			cout << char(board[i]) << " | ";
-		}
-		else {
-			if (i == 0) {
-				cout << "A: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 9) {
-				cout << endl << "B: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 18) {
-				cout << endl << "C: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 27) {
-				cout << endl << "D: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-			else if (i == 36) {
-				cout << endl << "E: ";
-				cout << "| " << char(board[i]) << " | ";
-			}
-=======
 // Function to Print Current Board Configuration
 void PrintBoard(){
 
@@ -98,7 +66,6 @@ void PrintBoard(){
 		// Prints the Line Letter
 		if (i % ROW_LENGTH == 0) {
 			cout << "\n\n  " << (char)(startLetter + (i / ROW_LENGTH)) << " ";
->>>>>>> d814d389348f5e92134a7f2a5e0ddc12c4ad7e01
 		}
 
 		// Prints Content of the Line 
