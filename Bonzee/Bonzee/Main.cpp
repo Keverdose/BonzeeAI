@@ -11,7 +11,10 @@ using std::string;
 static const int MAX_BOARD_SIZE = 45;
 static const int ROW_LENGTH = 9;
 static const int COLUMN_LENGTH = 5;
+static const int MAX_PIECES_NUM = 22;
 
+static int greenCounter = MAX_PIECES_NUM;
+static int redCounter = MAX_PIECES_NUM;
 static const enum Color { R = 'R', G = 'G', E = ' ' };
 static bool player = true;
 
@@ -46,13 +49,39 @@ char board[MAX_BOARD_SIZE] = {
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
+bool isGameOver();
+bool availableSpace(int currentPosition);
 
 int main() {
-	PrintBoard();
-	ProcessMoveRequest();
+	while (!isGameOver())
+	{
+		if (player)
+		{
+			cout << "Player One's Turn\n\n";
+		}
+		else
+		{
+			cout << "Player Two's Turn\n\n";
+		}
+		PrintBoard();
+		ProcessMoveRequest();
+		cin.get();
+		player = !player;
+	}
+
+	if (greenCounter <= 0)
+		cout << "Game Over Red Wins!";
+
+	else if (redCounter <= 0)
+		cout << "Game Over Green Wins!";
 	cin.get();
 }
 
+// Function to check if game is over or not.
+bool isGameOver()
+{
+	return (greenCounter <= 0 || redCounter <= 0);
+}
 // Function to Print Current Board Configuration
 void PrintBoard(){
 
