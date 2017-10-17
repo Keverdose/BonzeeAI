@@ -102,21 +102,24 @@ bool availableSpace(int currentPosition) {
 	if ((currentPosition % ROW_LENGTH) != 0) { // Makes sure the leftmost column can't go left
 		if (board[currentPosition - 1] == Color::E) { return true; }
 	}
-	// Checks topleft
-	if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
-		if (board[currentPosition - (ROW_LENGTH + 1)] == Color::E) { return true; }
-	}
-	// Checks topright
-	if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-		if (board[currentPosition - (ROW_LENGTH - 1)] == Color::E) { return true; }
-	}
-	// Checks bottomleft
-	if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
-		if (board[currentPosition + (ROW_LENGTH - 1)] == Color::E) { return true; }
-	}
-	// Checks bottomright
-	if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-		if (board[currentPosition + (ROW_LENGTH + 1)] == Color::E) { return true; }
+	//IF CELL IS BLACK
+	if (currentPosition % 2) {
+		// Checks topleft
+		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
+			if (board[currentPosition - (ROW_LENGTH + 1)] == Color::E) { return true; }
+		}
+		// Checks topright
+		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+			if (board[currentPosition - (ROW_LENGTH - 1)] == Color::E) { return true; }
+		}
+		// Checks bottomleft
+		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
+			if (board[currentPosition + (ROW_LENGTH - 1)] == Color::E) { return true; }
+		}
+		// Checks bottomright
+		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+			if (board[currentPosition + (ROW_LENGTH + 1)] == Color::E) { return true; }
+		}
 	}
 	/*if (currentPosition < 36) {
 		if (board[currentPosition + ROW_LENGTH] == Color::E) { return true; }
