@@ -11,7 +11,10 @@ using std::string;
 static const int MAX_BOARD_SIZE = 45;
 static const int ROW_LENGTH = 9;
 static const int COLUMN_LENGTH = 5;
+static const int MAX_PIECES_NUM = 22;
 
+static int greenCounter = MAX_PIECES_NUM;
+static int redCounter = MAX_PIECES_NUM;
 static const enum Color { R = 'R', G = 'G', E = ' ' };
 static bool player = true;
 
@@ -46,13 +49,39 @@ char board[MAX_BOARD_SIZE] = {
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
+bool isGameOver();
+bool availableSpace(int currentPosition);
 
 int main() {
-	PrintBoard();
-	ProcessMoveRequest();
+	while (!isGameOver())
+	{
+		if (player)
+		{
+			cout << "Player One's Turn\n\n";
+		}
+		else
+		{
+			cout << "Player Two's Turn\n\n";
+		}
+		PrintBoard();
+		ProcessMoveRequest();
+		cin.get();
+		player = !player;
+	}
+
+	if (greenCounter <= 0)
+		cout << "Game Over Red Wins!";
+
+	else if (redCounter <= 0)
+		cout << "Game Over Green Wins!";
 	cin.get();
 }
 
+// Function to check if game is over or not.
+bool isGameOver()
+{
+	return (greenCounter <= 0 || redCounter <= 0);
+}
 // Function to Print Current Board Configuration
 void PrintBoard(){
 
@@ -137,28 +166,65 @@ bool availableSpace(int currentPosition) {
 	return false;
 }
 
-void ProcessMoveRequest(){
+void ProcessMoveRequest() {
 	cout << endl << "Please enter current piece to move: " << endl;
 	string choice;
 	getline(cin, choice);
-	if (choice.at(0) == 'A'){
-		int colChoice = (int) choice.at(1) - 48;
-		cout << char(board[colChoice - 1]);
+	cout << "Current Piece Selected: ";
+	cout << (char(choice.at(0)));
+	cout << (char(choice.at(1))) << endl;
+
+	cout << "Please enter which empty space to move to: ";
+	string destination;
+	getline(cin, destination);
+	cout << "Destination Location: ";
+	cout << (char(destination.at(0)));
+	cout << (char(destination.at(1))) << endl;
+
+	char letter = choice.at(0);
+	int number = (int)choice.at(1) - 48;
+
+	//cout << number;
+	char destinationLetter = destination.at(0);
+	int destinationNumber = (int)destination.at(1) - 48;
+	int offset;
+	int destinationOffset;
+
+	switch (letter)
+	{
+	case 'a': offset = 0;
+		break;
+	case 'b': offset = 9;
+		break;
+	case 'c': offset = 18;
+		break;
+	case 'd': offset = 27;
+		break;
+	case 'e': offset = 36;
+		break;
+	default: cout << "NO";
 	}
-	else if (choice.at(0) == 'B'){
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[9 + colChoice - 1]);
+
+	switch (destinationLetter)
+	{
+	case 'a': destinationOffset = 0;
+		break;
+	case 'b': destinationOffset = 9;
+		break;
+	case 'c': destinationOffset = 18;
+		break;
+	case 'd': destinationOffset = 27;
+		break;
+	case 'e': destinationOffset = 36;
+		break;
+	default: cout << "NO";
 	}
-	else if (choice.at(0) == 'C'){
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[18 + colChoice - 1]);
-	}
-	else if (choice.at(0) == 'D'){
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[27 + colChoice - 1]);
-	}
-	else{
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[36 + colChoice - 1]);
-	}
+
+	Color currentCell = board[offset + (number - 1)];
+	Color destinationCell = board[destinationOffset + (destinationNumber - 1)];
+
+	board[offset + (number - 1)] = destinationCell;
+	board[destinationOffset + (destinationNumber - 1)] = currentCell;
+
+	PrintBoard();
 }
