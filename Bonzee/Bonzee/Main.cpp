@@ -10,7 +10,11 @@ using std::string;
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
 static const int ROW_LENGTH = 9;
+<<<<<<< HEAD
 static const int COLUMN_LENGTH = 5;
+=======
+static const int COL_LENGTH = 5;
+>>>>>>> d814d389348f5e92134a7f2a5e0ddc12c4ad7e01
 static const enum Color { R = 'R', G = 'G', E = ' ' };
 static bool player = true;
 
@@ -52,6 +56,7 @@ int main() {
 	cin.get();
 }
 
+<<<<<<< HEAD
 void PrintBoard() {
 	cout << "     1   2   3   4   5   6   7   8   9" << endl;
 	for (auto i = 0; i < MAX_BOARD_SIZE; i++) {
@@ -79,9 +84,33 @@ void PrintBoard() {
 				cout << endl << "E: ";
 				cout << "| " << char(board[i]) << " | ";
 			}
+=======
+// Function to Print Current Board Configuration
+void PrintBoard(){
+
+	cout << " ============================================================ " << endl;
+	cout << "\n       1     2     3     4     5     6     7     8     9";
+
+	char startLetter = 'A';
+
+	for (auto i = 0; i < MAX_BOARD_SIZE; i++) {
+		
+		// Prints the Line Letter
+		if (i % ROW_LENGTH == 0) {
+			cout << "\n\n  " << (char)(startLetter + (i / ROW_LENGTH)) << " ";
+>>>>>>> d814d389348f5e92134a7f2a5e0ddc12c4ad7e01
 		}
+
+		// Prints Content of the Line 
+		if (i % 2 == 0)
+			cout << " [ " << (char)board[i] << " ]";
+		else
+			cout << " ( " << (char)board[i] << " )";
+		
 	}
-	cout << endl;
+
+	cout << "\n\n ============================================================\n" << endl;
+
 }
 
 // Function that returns boolean to check whether the selected token has an available move
