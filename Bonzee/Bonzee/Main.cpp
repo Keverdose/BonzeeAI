@@ -132,7 +132,7 @@ bool availableSpace(int currentPosition) {
 		if (board[currentPosition - 1] == Color::E) { return true; }
 	}
 	//IF CELL IS BLACK
-	if (currentPosition % 2) {
+	if (currentPosition % 2 == 0) {
 		// Checks topleft
 		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
 			if (board[currentPosition - (ROW_LENGTH + 1)] == Color::E) { return true; }
@@ -166,59 +166,85 @@ bool availableSpace(int currentPosition) {
 	return false;
 }
 
+// Checks whether it is a valid destination 
+// todo -- make sure that position and destination are a valid index in array
+bool destinationCheck(int position, int destination) {
+	// If cell occupied, return false;
+	if (board[destination] != Color::E) { return false; }
+
+	//Else check if the cell is adjacent to position.
+	if (position % ROW_LENGTH == 0) { // Have to make sure that the 1st column and last column cant go left or right
+		return(position + 1 == destination || position + 10 == destination || position - 9 == destination || position + 9 == destination || position - 8 == destination);
+	}
+	else if (position % ROW_LENGTH == ROW_LENGTH - 1) {
+		return(position - 1 == destination || position - 10 == destination || position - 9 == destination || position + 9 == destination || position + 8 == destination);
+	}
+	return(position + 1 == destination
+		|| position - 1 == destination
+		|| position - 10 == destination
+		|| position + 10 == destination
+		|| position - 9 == destination
+		|| position + 9 == destination
+		|| position - 8 == destination
+		|| position + 8 == destination); 
+}
+
 void ProcessMoveRequest() {
-	cout << endl << "Please enter current piece to move: " << endl;
+	bool wrongInput = true;
 	string choice;
-	getline(cin, choice);
-	cout << "Current Piece Selected: ";
-	cout << (char(choice.at(0)));
-	cout << (char(choice.at(1))) << endl;
-
-	cout << "Please enter which empty space to move to: ";
 	string destination;
-	getline(cin, destination);
-	cout << "Destination Location: ";
-	cout << (char(destination.at(0)));
-	cout << (char(destination.at(1))) << endl;
-
-	char letter = choice.at(0);
-	int number = (int)choice.at(1) - 48;
-
-	//cout << number;
-	char destinationLetter = destination.at(0);
-	int destinationNumber = (int)destination.at(1) - 48;
 	int offset;
 	int destinationOffset;
+	do {
+		cout << endl << "Please enter current piece to move: " << endl;
+		getline(cin, choice);
+		cout << "Current Piece Selected: ";
+		cout << (char(choice.at(0)));
+		cout << (char(choice.at(1))) << endl;
 
-	switch (letter)
-	{
-	case 'a': offset = 0;
-		break;
-	case 'b': offset = 9;
-		break;
-	case 'c': offset = 18;
-		break;
-	case 'd': offset = 27;
-		break;
-	case 'e': offset = 36;
-		break;
-	default: cout << "NO";
-	}
+		cout << "Please enter which empty space to move to: ";
+		getline(cin, destination);
+		cout << "Destination Location: ";
+		cout << (char(destination.at(0)));
+		cout << (char(destination.at(1))) << endl;
 
-	switch (destinationLetter)
-	{
-	case 'a': destinationOffset = 0;
-		break;
-	case 'b': destinationOffset = 9;
-		break;
-	case 'c': destinationOffset = 18;
-		break;
-	case 'd': destinationOffset = 27;
-		break;
-	case 'e': destinationOffset = 36;
-		break;
-	default: cout << "NO";
-	}
+		char letter = choice.at(0);
+		int number = (int)choice.at(1) - 48;
+
+		//cout << number;
+		char destinationLetter = destination.at(0);
+		int destinationNumber = (int)destination.at(1) - 48;
+
+		switch (letter)
+		{
+		case 'a': offset = 0;
+			break;
+		case 'b': offset = 9;
+			break;
+		case 'c': offset = 18;
+			break;
+		case 'd': offset = 27;
+			break;
+		case 'e': offset = 36;
+			break;
+		default: cout << "Wrong input, please try again";
+		}
+
+		switch (destinationLetter)
+		{
+		case 'a': destinationOffset = 0;
+			break;
+		case 'b': destinationOffset = 9;
+			break;
+		case 'c': destinationOffset = 18;
+			break;
+		case 'd': destinationOffset = 27;
+			break;
+		case 'e': destinationOffset = 36;
+			break;
+		default: cout << "Wrong input, please try again";
+		}
+	} while (!wrongInput);
 
 	Color currentCell = board[offset + (number - 1)];
 	Color destinationCell = board[destinationOffset + (destinationNumber - 1)];
