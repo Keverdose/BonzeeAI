@@ -9,7 +9,10 @@ using std::string;
 
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
+static const int ROW_LENGTH = 9;
+static const int COLUMN_LENGTH = 5;
 static const enum Color { R = 'R', G = 'G', E = ' ' };
+static bool player = true;
 
 /* BOARD LAYOUT:
 	1  2  3  4  5  6  7  8  9
@@ -43,42 +46,96 @@ char board[MAX_BOARD_SIZE] = {
 void PrintBoard();
 void ProcessMoveRequest();
 
-int main(){
+int main() {
 	PrintBoard();
 	ProcessMoveRequest();
 	cin.get();
 }
 
-void PrintBoard(){
+void PrintBoard() {
 	cout << "     1   2   3   4   5   6   7   8   9" << endl;
-	for (auto i = 0; i < MAX_BOARD_SIZE; i++){
-		if (i % 9 != 0){
+	for (auto i = 0; i < MAX_BOARD_SIZE; i++) {
+		if (i % 9 != 0) {
 			cout << char(board[i]) << " | ";
 		}
-		else{
-			if (i == 0){
+		else {
+			if (i == 0) {
 				cout << "A: ";
 				cout << "| " << char(board[i]) << " | ";
 			}
-			else if (i == 9){
+			else if (i == 9) {
 				cout << endl << "B: ";
 				cout << "| " << char(board[i]) << " | ";
 			}
-			else if (i == 18){
+			else if (i == 18) {
 				cout << endl << "C: ";
 				cout << "| " << char(board[i]) << " | ";
 			}
-			else if (i == 27){
+			else if (i == 27) {
 				cout << endl << "D: ";
 				cout << "| " << char(board[i]) << " | ";
 			}
-			else if (i == 36){
+			else if (i == 36) {
 				cout << endl << "E: ";
 				cout << "| " << char(board[i]) << " | ";
 			}
 		}
 	}
 	cout << endl;
+}
+
+// Function that returns boolean to check whether the selected token has an available move
+bool availableSpace(int currentPosition) {
+	// If the current position is out of bound
+	if (currentPosition < 0 || currentPosition > 44) {
+		return false;
+	}
+	// Checks downwards
+	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
+		if (board[currentPosition + ROW_LENGTH] == Color::E) { return true; }
+	}
+	// Checks upwards
+	if (currentPosition - ROW_LENGTH > -1) {
+		if (board[currentPosition - 9] == Color::E) { return true; }
+	}
+	// Checks right
+	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) { // Makes sure the rightmost column can't go right
+		if (board[currentPosition + 1] == Color::E) { return true; }
+	}
+	// Checks left
+	if ((currentPosition % ROW_LENGTH) != 0) { // Makes sure the leftmost column can't go left
+		if (board[currentPosition - 1] == Color::E) { return true; }
+	}
+	// Checks topleft
+	if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
+		if (board[currentPosition - (ROW_LENGTH + 1)] == Color::E) { return true; }
+	}
+	// Checks topright
+	if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+		if (board[currentPosition - (ROW_LENGTH - 1)] == Color::E) { return true; }
+	}
+	// Checks bottomleft
+	if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
+		if (board[currentPosition + (ROW_LENGTH - 1)] == Color::E) { return true; }
+	}
+	// Checks bottomright
+	if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+		if (board[currentPosition + (ROW_LENGTH + 1)] == Color::E) { return true; }
+	}
+	/*if (currentPosition < 36) {
+		if (board[currentPosition + ROW_LENGTH] == Color::E) { return true; }
+	}
+	if (currentPosition > 8) {
+		if (board[currentPosition - 9] == Color::E) { return true; }
+	}
+	if (currentPosition != 8 || currentPosition != 17 || currentPosition != 26 || currentPosition != 35 || currentPosition != 44) {
+		if (board[currentPosition + 1] == Color::E) { return true; }
+	}
+	if (currentPosition != 0 || currentPosition != 9 || currentPosition != 18 || currentPosition != 27 || currentPosition != 36) {
+		if (board[currentPosition + 1] == Color::E) { return true; }
+	}*/
+
+	return false;
 }
 
 void ProcessMoveRequest(){
