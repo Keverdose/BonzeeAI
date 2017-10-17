@@ -137,28 +137,65 @@ bool availableSpace(int currentPosition) {
 	return false;
 }
 
-void ProcessMoveRequest(){
+void ProcessMoveRequest() {
 	cout << endl << "Please enter current piece to move: " << endl;
 	string choice;
 	getline(cin, choice);
-	if (choice.at(0) == 'A'){
-		int colChoice = (int) choice.at(1) - 48;
-		cout << char(board[colChoice - 1]);
+	cout << "Current Piece Selected: ";
+	cout << (char(choice.at(0)));
+	cout << (char(choice.at(1))) << endl;
+
+	cout << "Please enter which empty space to move to: ";
+	string destination;
+	getline(cin, destination);
+	cout << "Destination Location: ";
+	cout << (char(destination.at(0)));
+	cout << (char(destination.at(1))) << endl;
+
+	char letter = choice.at(0);
+	int number = (int)choice.at(1) - 48;
+
+	//cout << number;
+	char destinationLetter = destination.at(0);
+	int destinationNumber = (int)destination.at(1) - 48;
+	int offset;
+	int destinationOffset;
+
+	switch (letter)
+	{
+	case 'a': offset = 0;
+		break;
+	case 'b': offset = 9;
+		break;
+	case 'c': offset = 18;
+		break;
+	case 'd': offset = 27;
+		break;
+	case 'e': offset = 36;
+		break;
+	default: cout << "NO";
 	}
-	else if (choice.at(0) == 'B'){
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[9 + colChoice - 1]);
+
+	switch (destinationLetter)
+	{
+	case 'a': destinationOffset = 0;
+		break;
+	case 'b': destinationOffset = 9;
+		break;
+	case 'c': destinationOffset = 18;
+		break;
+	case 'd': destinationOffset = 27;
+		break;
+	case 'e': destinationOffset = 36;
+		break;
+	default: cout << "NO";
 	}
-	else if (choice.at(0) == 'C'){
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[18 + colChoice - 1]);
-	}
-	else if (choice.at(0) == 'D'){
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[27 + colChoice - 1]);
-	}
-	else{
-		int colChoice = (int)choice.at(1) - 48;
-		cout << char(board[36 + colChoice - 1]);
-	}
+
+	Color currentCell = board[offset + (number - 1)];
+	Color destinationCell = board[destinationOffset + (destinationNumber - 1)];
+
+	board[offset + (number - 1)] = destinationCell;
+	board[destinationOffset + (destinationNumber - 1)] = currentCell;
+
+	PrintBoard();
 }
