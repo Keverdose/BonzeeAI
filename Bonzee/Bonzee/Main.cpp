@@ -67,16 +67,13 @@ int BoardToIndex(string);
 int main() {
 	while (!isGameOver())
 	{
-		if (player)
-		{
+		if (player){
 			cout << "Player One's Turn\n\n";
 		}
-		else
-		{
+		else{
 			cout << "Player Two's Turn\n\n";
 		}
 		PrintBoard();
-		//TODO Make game loop, while(game is not over) keep proccessingmoverequests.
 		ProcessMoveRequest();
 		cin.get();
 		player = !player;
