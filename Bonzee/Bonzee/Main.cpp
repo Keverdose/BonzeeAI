@@ -69,6 +69,7 @@ int main() {
 			cout << "Player Two's Turn\n\n";
 		}
 		PrintBoard();
+		//TODO Make game loop, while(game is not over) keep proccessingmoverequests.
 		ProcessMoveRequest();
 		cin.get();
 		player = !player;
@@ -172,7 +173,6 @@ bool availableSpace(int currentPosition) {
 }
 
 // Checks whether it is a valid destination 
-// todo -- make sure that position and destination are a valid index in array
 bool destinationCheck(int position, int destination) {
 	// If cell occupied, return false;
 	if (board[destination] != Color::E) { return false; }
@@ -204,23 +204,19 @@ void ProcessMoveRequest() {
 		// Checks if answer is legit
 		if (answer.length() != 5) {
 			cout << "Invalid String, please try again." << endl;
-			PrintBoard();
 		}
 		else if (answer.at(2) != ' ') {
 			cout << "Invalid String, please try again." << endl;
-			PrintBoard();
 		}
 		else {
 			// Transforms the answer into two coordinates
 			string choice, destination;
 			int choIndex, destIndex;
-
-//	BROKEN TO-DO FIX THIS, DOES NOT CONCATENATE THE CHAR BUT ADDS THEM FOR 1 CHAR.
 			choice = { answer.at(0),answer.at(1) };
 			destination = { answer.at(3) , answer.at(4) };
 			cout << "Position: " << choice << ", Destination: " << destination << endl;
 			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
-			if (IsValidChoice(choice) || IsValidChoice(destination)) {
+			if (IsValidChoice(choice) && IsValidChoice(destination)) {
 				choIndex = BoardToIndex(choice);
 				destIndex = BoardToIndex(destination);
 				// Checks if its the current player's token, if there's available move for choindex, and if the destination is valid.
@@ -228,15 +224,16 @@ void ProcessMoveRequest() {
 					board[destIndex] = board[choIndex];
 					board[choIndex] = Color::E;
 					completedTurn = true;
-					PrintBoard();
+				}
+				else {
+					cout << "This is an invalid move for the player. Please try again." << endl;
 				}
 			}
 			else {
 				cout << "Invalid positions, please try again." << endl;
-				PrintBoard();
-
 			}
 		}
+		PrintBoard();
 
 	} while (!completedTurn);
 }
