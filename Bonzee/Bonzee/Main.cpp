@@ -216,8 +216,8 @@ void ProcessMoveRequest() {
 			int choIndex, destIndex;
 
 //	BROKEN TO-DO FIX THIS, DOES NOT CONCATENATE THE CHAR BUT ADDS THEM FOR 1 CHAR.
-			choice = answer.at(0); //+ answer.at(1);
-			destination = answer.at(3) + answer.at(4);
+			choice = { answer.at(0),answer.at(1) };
+			destination = { answer.at(3) , answer.at(4) };
 			cout << "Position: " << choice << ", Destination: " << destination << endl;
 			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
 			if (IsValidChoice(choice) || IsValidChoice(destination)) {
@@ -228,6 +228,7 @@ void ProcessMoveRequest() {
 					board[destIndex] = board[choIndex];
 					board[choIndex] = Color::E;
 					completedTurn = true;
+					PrintBoard();
 				}
 			}
 			else {
@@ -277,5 +278,5 @@ int BoardToIndex(string choice) {
 	case 'e': offset = 4;
 		break;
 	}
-	return (offset + (int)choice.at(1) - 1);
+	return (offset*ROW_LENGTH + (int)choice.at(1)-48 - 1);
 }
