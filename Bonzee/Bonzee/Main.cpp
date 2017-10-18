@@ -46,6 +46,13 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 */
 
+/*char winOneMoveBoard[MAX_BOARD_SIZE] = {
+	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+	'G', 'G', 'R', 'G', ' ', 'R', 'R', 'R', ' ',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };*/
+
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
