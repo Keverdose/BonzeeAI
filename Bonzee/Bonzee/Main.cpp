@@ -50,7 +50,12 @@ char board[MAX_BOARD_SIZE] = {
 void PrintBoard();
 void ProcessMoveRequest();
 bool isGameOver();
-bool availableSpace(int currentPosition);
+bool availableSpace(int);
+bool isValid(Color);
+bool IsValidChoice(string);
+bool destinationCheck(int, int);
+int BoardToIndex(string);
+
 
 int main() {
 	while (!isGameOver())
@@ -132,7 +137,7 @@ bool availableSpace(int currentPosition) {
 		if (board[currentPosition - 1] == Color::E) { return true; }
 	}
 	//IF CELL IS BLACK
-	if (currentPosition % 2) {
+	if (currentPosition % 2 == 0) {
 		// Checks topleft
 		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
 			if (board[currentPosition - (ROW_LENGTH + 1)] == Color::E) { return true; }
@@ -166,65 +171,112 @@ bool availableSpace(int currentPosition) {
 	return false;
 }
 
+// Checks whether it is a valid destination 
+// todo -- make sure that position and destination are a valid index in array
+bool destinationCheck(int position, int destination) {
+	// If cell occupied, return false;
+	if (board[destination] != Color::E) { return false; }
+
+	//Else check if the cell is adjacent to position.
+	if (position % ROW_LENGTH == 0) { // Have to make sure that the 1st column and last column cant go left or right
+		return(position + 1 == destination || position + 10 == destination || position - 9 == destination || position + 9 == destination || position - 8 == destination);
+	}
+	else if (position % ROW_LENGTH == ROW_LENGTH - 1) {
+		return(position - 1 == destination || position - 10 == destination || position - 9 == destination || position + 9 == destination || position + 8 == destination);
+	}
+	return(position + 1 == destination
+		|| position - 1 == destination
+		|| position - 10 == destination
+		|| position + 10 == destination
+		|| position - 9 == destination
+		|| position + 9 == destination
+		|| position - 8 == destination
+		|| position + 8 == destination); 
+}
+
 void ProcessMoveRequest() {
-	cout << endl << "Please enter current piece to move: " << endl;
-	string choice;
-	getline(cin, choice);
-	cout << "Current Piece Selected: ";
-	cout << (char(choice.at(0)));
-	cout << (char(choice.at(1))) << endl;
+	bool completedTurn = false;
+	string answer;
+	do
+	{
+		cout << endl << "Please enter move: ";
+		getline(cin, answer);
+		// Checks if answer is legit
+		if (answer.length() != 5) {
+			cout << "Invalid String, please try again." << endl;
+			PrintBoard();
+		}
+		else if (answer.at(2) != ' ') {
+			cout << "Invalid String, please try again." << endl;
+			PrintBoard();
+		}
+		else {
+			// Transforms the answer into two coordinates
+			string choice, destination;
+			int choIndex, destIndex;
 
-	cout << "Please enter which empty space to move to: ";
-	string destination;
-	getline(cin, destination);
-	cout << "Destination Location: ";
-	cout << (char(destination.at(0)));
-	cout << (char(destination.at(1))) << endl;
+//	BROKEN TO-DO FIX THIS, DOES NOT CONCATENATE THE CHAR BUT ADDS THEM FOR 1 CHAR.
+			choice = { answer.at(0),answer.at(1) };
+			destination = { answer.at(3) , answer.at(4) };
+			cout << "Position: " << choice << ", Destination: " << destination << endl;
+			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
+			if (IsValidChoice(choice) || IsValidChoice(destination)) {
+				choIndex = BoardToIndex(choice);
+				destIndex = BoardToIndex(destination);
+				// Checks if its the current player's token, if there's available move for choindex, and if the destination is valid.
+				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex,destIndex)) {
+					board[destIndex] = board[choIndex];
+					board[choIndex] = Color::E;
+					completedTurn = true;
+					PrintBoard();
+				}
+			}
+			else {
+				cout << "Invalid positions, please try again." << endl;
+				PrintBoard();
 
-	char letter = choice.at(0);
-	int number = (int)choice.at(1) - 48;
+			}
+		}
 
-	//cout << number;
-	char destinationLetter = destination.at(0);
-	int destinationNumber = (int)destination.at(1) - 48;
+	} while (!completedTurn);
+}
+
+// Method to check whether green or red is playing.
+bool isValid(Color col)
+{
+	if (player){
+		return (col == Color::G);
+	}
+	else{
+		return (col == Color::R);
+	}
+}
+
+// Method to check whether the choice is in the board or not
+bool IsValidChoice(string choice) {
+	if (choice == "") { return false; }
+	if (choice.at(0) == 'a' || choice.at(0) == 'b' || choice.at(0) == 'c' || choice.at(0) == 'd' || choice.at(0) == 'e') {
+		if ((int)choice.at(1) - 48 > 0 && (int)choice.at(1) - 48 < 9) { return true; }
+	}
+	return false;
+}
+
+// Method to change the coordinates to arrayIndex
+int BoardToIndex(string choice) {
+	char row = choice.at(0);
 	int offset;
-	int destinationOffset;
-
-	switch (letter)
+	switch (tolower(row))
 	{
 	case 'a': offset = 0;
 		break;
-	case 'b': offset = 9;
+	case 'b': offset = 1;
 		break;
-	case 'c': offset = 18;
+	case 'c': offset = 2;
 		break;
-	case 'd': offset = 27;
+	case 'd': offset = 3;
 		break;
-	case 'e': offset = 36;
+	case 'e': offset = 4;
 		break;
-	default: cout << "NO";
 	}
-
-	switch (destinationLetter)
-	{
-	case 'a': destinationOffset = 0;
-		break;
-	case 'b': destinationOffset = 9;
-		break;
-	case 'c': destinationOffset = 18;
-		break;
-	case 'd': destinationOffset = 27;
-		break;
-	case 'e': destinationOffset = 36;
-		break;
-	default: cout << "NO";
-	}
-
-	Color currentCell = board[offset + (number - 1)];
-	Color destinationCell = board[destinationOffset + (destinationNumber - 1)];
-
-	board[offset + (number - 1)] = destinationCell;
-	board[destinationOffset + (destinationNumber - 1)] = currentCell;
-
-	PrintBoard();
+	return (offset*ROW_LENGTH + (int)choice.at(1)-48 - 1);
 }
