@@ -322,12 +322,13 @@ void attacking(int pos, int dest) {
 			board[attacked] = ' ';
 			tempPosition = attacked;
 			attacked += direction;
-		}
-		if (player) {
-			redCounter--;
-		}
-		else {
-			greenCounter--;
+
+			if (player) {
+				redCounter--;
+			}
+			else {
+				greenCounter--;
+			}
 		}
 
 	}
