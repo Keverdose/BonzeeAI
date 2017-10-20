@@ -15,7 +15,7 @@ static const int MAX_PIECES_NUM = 22;
 
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter = MAX_PIECES_NUM;
-static const enum Color { R = 'R', G = 'G', E = ' ' };
+// static const enum Color { R = 'R', G = 'G', E = ' ' };
 static bool player = true;
 
 /* BOARD LAYOUT:
@@ -30,21 +30,22 @@ So A maps to [0, 8] range in array, etc.
 A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 1-9)
 */
 
+/* ENUM version of board
 Color board[MAX_BOARD_SIZE] = {
 	R, R, R, R, R, R, R, R, R,
 	R, R, R, R, R, R, R, R, R,
 	G, G, G, G, E, R, R, R, R,
 	G, G, G, G, G, G, G, G, G,
 	G, G, G, G, G, G, G, G, G };
+	*/
 
-/* // -- char version of board
+// -- char version of board
 char board[MAX_BOARD_SIZE] = {
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
 	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
-*/
 
 /*char winOneMoveBoard[MAX_BOARD_SIZE] = {
 	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
@@ -58,7 +59,7 @@ void PrintBoard();
 void ProcessMoveRequest();
 bool isGameOver();
 bool availableSpace(int);
-bool isValid(Color);
+bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
@@ -109,9 +110,9 @@ void PrintBoard(){
 
 		// Prints Content of the Line 
 		if (i % 2 == 0)
-			cout << " [ " << (char)board[i] << " ]";
+			cout << " [ " << board[i] << " ]";
 		else
-			cout << " ( " << (char)board[i] << " )";
+			cout << " ( " << board[i] << " )";
 		
 	}
 
@@ -127,37 +128,37 @@ bool availableSpace(int currentPosition) {
 	}
 	// Checks downwards
 	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
-		if (board[currentPosition + ROW_LENGTH] == Color::E) { return true; }
+		if (board[currentPosition + ROW_LENGTH] == ' ') { return true; }
 	}
 	// Checks upwards
 	if (currentPosition - ROW_LENGTH > -1) {
-		if (board[currentPosition - 9] == Color::E) { return true; }
+		if (board[currentPosition - 9] == ' ') { return true; }
 	}
 	// Checks right
 	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) { // Makes sure the rightmost column can't go right
-		if (board[currentPosition + 1] == Color::E) { return true; }
+		if (board[currentPosition + 1] == ' ') { return true; }
 	}
 	// Checks left
 	if ((currentPosition % ROW_LENGTH) != 0) { // Makes sure the leftmost column can't go left
-		if (board[currentPosition - 1] == Color::E) { return true; }
+		if (board[currentPosition - 1] == ' ') { return true; }
 	}
 	//IF CELL IS BLACK
 	if (currentPosition % 2 == 0) {
 		// Checks topleft
 		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
-			if (board[currentPosition - (ROW_LENGTH + 1)] == Color::E) { return true; }
+			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') { return true; }
 		}
 		// Checks topright
 		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition - (ROW_LENGTH - 1)] == Color::E) { return true; }
+			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') { return true; }
 		}
 		// Checks bottomleft
 		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
-			if (board[currentPosition + (ROW_LENGTH - 1)] == Color::E) { return true; }
+			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') { return true; }
 		}
 		// Checks bottomright
 		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition + (ROW_LENGTH + 1)] == Color::E) { return true; }
+			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') { return true; }
 		}
 	}
 	/*if (currentPosition < 36) {
@@ -179,7 +180,7 @@ bool availableSpace(int currentPosition) {
 // Checks whether it is a valid destination 
 bool destinationCheck(int position, int destination) {
 	// If cell occupied, return false;
-	if (board[destination] != Color::E) { return false; }
+	if (board[destination] != ' ') { return false; }
 
 	//Else check if the cell is adjacent to position.
 	if (position % ROW_LENGTH == 0) { // Have to make sure that the 1st column and last column cant go left or right
@@ -226,7 +227,7 @@ void ProcessMoveRequest() {
 				// Checks if its the current player's token, if there's available move for choindex, and if the destination is valid.
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex,destIndex)) {
 					board[destIndex] = board[choIndex];
-					board[choIndex] = Color::E;
+					board[choIndex] = ' ';
 					completedTurn = true;
 				}
 				else {
@@ -243,13 +244,13 @@ void ProcessMoveRequest() {
 }
 
 // Method to check whether green or red is playing.
-bool isValid(Color col)
+bool isValid(char color)
 {
 	if (player){
-		return (col == Color::G);
+		return (color == 'G');
 	}
 	else{
-		return (col == Color::R);
+		return (color == 'R');
 	}
 }
 
