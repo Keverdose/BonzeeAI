@@ -266,7 +266,7 @@ bool isValid(char color)
 bool IsValidChoice(string choice) {
 	if (choice == "") { return false; }
 	if (choice.at(0) == 'a' || choice.at(0) == 'b' || choice.at(0) == 'c' || choice.at(0) == 'd' || choice.at(0) == 'e') {
-		if ((int)choice.at(1) - 48 > 0 && (int)choice.at(1) - 48 < 9) { return true; }
+		if ((int)choice.at(1) - 48 > 0 && (int)choice.at(1) - 48 <= 9) { return true; }
 	}
 	return false;
 }
