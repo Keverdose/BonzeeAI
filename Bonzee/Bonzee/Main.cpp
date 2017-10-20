@@ -299,10 +299,37 @@ void attacking(int pos, int dest) {
 	int attacked = dest + direction;
 	char posColor = board[attacked];
 
-	while (attacked < 45 && attacked > -1 && (posColor == board[attacked]) && adjacent(tempPosition, attacked)) {
-		board[attacked] = ' ';
-		tempPosition = attacked;
-		attacked += direction;
+	// If there's no forward attack
+	if (board[attacked] == ' ' || board[attacked] == board[pos]) {
+		attacked = pos - direction;
+		tempPosition = pos;
+		posColor = board[attacked];
+		while (attacked < 45 && attacked > -1 && posColor == board[attacked] && adjacent(tempPosition, attacked)) {
+			board[attacked] = ' ';
+			tempPosition = attacked;
+			attacked -= direction;
+			if (player) {
+				redCounter--;
+			}
+			else {
+				greenCounter--;
+			}
+		}
+	}
+	// If it's forward attack
+	else{
+		while (attacked < 45 && attacked > -1 && (posColor == board[attacked]) && adjacent(tempPosition, attacked)) {
+			board[attacked] = ' ';
+			tempPosition = attacked;
+			attacked += direction;
+		}
+		if (player) {
+			redCounter--;
+		}
+		else {
+			greenCounter--;
+		}
+
 	}
 
 }
