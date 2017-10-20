@@ -294,12 +294,12 @@ int BoardToIndex(string choice) {
 // Method to process the attacking
 void attacking(int pos, int dest) {
 	// to-do Check the pos's color, check if dest + direction is opposite color, if so delete -> Loop until out of bounds of array (Wary of left and right column)
-	char posColor = board[pos];
 	int direction = dest - pos;
 	int tempPosition = dest;
 	int attacked = dest + direction;
+	char posColor = board[attacked];
 
-	while (attacked < 45 && attacked > -1 && posColor != board[attacked] && adjacent(tempPosition, attacked)) {
+	while (attacked < 45 && attacked > -1 && (posColor == board[attacked]) && adjacent(tempPosition, attacked)) {
 		board[attacked] = ' ';
 		tempPosition = attacked;
 		attacked += direction;
