@@ -63,6 +63,8 @@ bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
+void attacking(int, int);
+bool adjacent(int, int);
 
 
 int main() {
@@ -181,8 +183,13 @@ bool availableSpace(int currentPosition) {
 bool destinationCheck(int position, int destination) {
 	// If cell occupied, return false;
 	if (board[destination] != ' ') { return false; }
-
 	//Else check if the cell is adjacent to position.
+	else {
+		return adjacent(position, destination);
+	}
+}
+
+bool adjacent(int position, int destination) {
 	if (position % ROW_LENGTH == 0) { // Have to make sure that the 1st column and last column cant go left or right
 		return(position + 1 == destination || position + 10 == destination || position - 9 == destination || position + 9 == destination || position - 8 == destination);
 	}
@@ -196,7 +203,7 @@ bool destinationCheck(int position, int destination) {
 		|| position - 9 == destination
 		|| position + 9 == destination
 		|| position - 8 == destination
-		|| position + 8 == destination); 
+		|| position + 8 == destination);
 }
 
 void ProcessMoveRequest() {
@@ -226,6 +233,7 @@ void ProcessMoveRequest() {
 				destIndex = BoardToIndex(destination);
 				// Checks if its the current player's token, if there's available move for choindex, and if the destination is valid.
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex,destIndex)) {
+					attacking(choIndex, destIndex);
 					board[destIndex] = board[choIndex];
 					board[choIndex] = ' ';
 					completedTurn = true;
@@ -281,4 +289,20 @@ int BoardToIndex(string choice) {
 		break;
 	}
 	return (offset*ROW_LENGTH + (int)choice.at(1)-48 - 1);
+}
+
+// Method to process the attacking
+void attacking(int pos, int dest) {
+	// to-do Check the pos's color, check if dest + direction is opposite color, if so delete -> Loop until out of bounds of array (Wary of left and right column)
+	char posColor = board[pos];
+	int direction = dest - pos;
+	int tempPosition = dest;
+	int attacked = dest + direction;
+
+	while (attacked < 45 && attacked > -1 && posColor != board[attacked] && adjacent(tempPosition, attacked)) {
+		board[attacked] = ' ';
+		tempPosition = attacked;
+		attacked += direction;
+	}
+
 }
