@@ -15,7 +15,6 @@ static const int MAX_PIECES_NUM = 22;
 
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter = MAX_PIECES_NUM;
-// static const enum Color { R = 'R', G = 'G', E = ' ' };
 static bool isPlayerOne = true;
 
 /* BOARD LAYOUT:
@@ -30,14 +29,6 @@ So A maps to [0, 8] range in array, etc.
 A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 1-9)
 */
 
-/* ENUM version of board
-Color board[MAX_BOARD_SIZE] = {
-	R, R, R, R, R, R, R, R, R,
-	R, R, R, R, R, R, R, R, R,
-	G, G, G, G, E, R, R, R, R,
-	G, G, G, G, G, G, G, G, G,
-	G, G, G, G, G, G, G, G, G };
-	*/
 
 // -- char version of board
 char board[MAX_BOARD_SIZE] = {
@@ -47,12 +38,17 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
-/*char winOneMoveBoard[MAX_BOARD_SIZE] = {
+
+// Board setting to win in one move
+/*char board[MAX_BOARD_SIZE] = {
 	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
 	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
 	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };*/
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+	
+redCounter = 3;
+	*/
 
 // -- Function definitions
 void PrintBoard();
@@ -119,70 +115,129 @@ void PrintBoard() {
 		if (i % 2 == 0)
 			cout << " [ " << board[i] << " ]";  // Black Square 
 		else
-			cout << " ( " << board[i] << " )";  // White Square
-		
+			cout << " ( " << board[i] << " )";  // White Square	
 	}
 
 	cout << "\n\n ============================================================\n" << endl;
 
 }
 
-// Function that returns boolean to check whether the selected token has an available move
-bool availableSpace(int currentPosition) {
-	// If the current position is out of bound
-	if (currentPosition < 0 || currentPosition > 44) {
-		return false;
-	}
-	// Checks downwards
-	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
-		if (board[currentPosition + ROW_LENGTH] == ' ') { return true; }
-	}
-	// Checks upwards
-	if (currentPosition - ROW_LENGTH > -1) {
-		if (board[currentPosition - 9] == ' ') { return true; }
-	}
-	// Checks right
-	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) { // Makes sure the rightmost column can't go right
-		if (board[currentPosition + 1] == ' ') { return true; }
-	}
-	// Checks left
-	if ((currentPosition % ROW_LENGTH) != 0) { // Makes sure the leftmost column can't go left
-		if (board[currentPosition - 1] == ' ') { return true; }
-	}
-	//IF CELL IS BLACK
-	if (currentPosition % 2 == 0) {
-		// Checks topleft
-		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
-			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') { return true; }
-		}
-		// Checks topright
-		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') { return true; }
-		}
-		// Checks bottomleft
-		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
-			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') { return true; }
-		}
-		// Checks bottomright
-		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') { return true; }
-		}
-	}
-	/*if (currentPosition < 36) {
-		if (board[currentPosition + ROW_LENGTH] == Color::E) { return true; }
-	}
-	if (currentPosition > 8) {
-		if (board[currentPosition - 9] == Color::E) { return true; }
-	}
-	if (currentPosition != 8 || currentPosition != 17 || currentPosition != 26 || currentPosition != 35 || currentPosition != 44) {
-		if (board[currentPosition + 1] == Color::E) { return true; }
-	}
-	if (currentPosition != 0 || currentPosition != 9 || currentPosition != 18 || currentPosition != 27 || currentPosition != 36) {
-		if (board[currentPosition + 1] == Color::E) { return true; }
-	}*/
 
-	return false;
+void ProcessMoveRequest() {
+
+	bool completedTurn = false;
+	string answer;
+
+	do {
+		cout << endl << "Please enter move: ";
+		getline(cin, answer);
+
+		// Input Validation
+		if (answer.length() != 5)
+			cout << "Invalid String, please try again." << endl;
+
+		else if (answer.at(2) != ' ')
+			cout << "Invalid String, please try again." << endl;
+
+
+		// Process Input
+		else {
+			// Transforms the answer into two coordinates
+			int choIndex, destIndex;
+			string choice = { answer.at(0), answer.at(1) };
+			string destination = { answer.at(3), answer.at(4) };
+
+			cout << "Position: " << choice << ", Destination: " << destination << endl;
+
+			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
+			if (IsValidChoice(choice) && IsValidChoice(destination)) {
+				choIndex = BoardToIndex(choice);
+				destIndex = BoardToIndex(destination);
+
+				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
+
+				/*if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {*/
+
+				if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
+
+					// Execute Attack Algorithm
+					attacking(choIndex, destIndex);
+
+					// Move attacking token forward/backward 
+					board[destIndex] = board[choIndex];
+					board[choIndex] = ' ';
+					completedTurn = true;
+				}
+
+				else
+					cout << "This is an invalid move for the player. Please try again." << endl;
+			}
+			else
+				cout << "Invalid positions, please try again." << endl;
+		}
+
+		PrintBoard();
+
+	} while (!completedTurn);
 }
+
+
+// Function that returns boolean to check whether the selected token has an available move
+//bool availableSpace(int currentPosition) {
+//
+//	// If the current position is out of bound
+//	if (currentPosition < 0 || currentPosition > 44) 
+//		return false;
+//
+//		
+//	// Checks downwards
+//	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) 
+//		if (board[currentPosition + ROW_LENGTH] == ' ') 
+//			return true; 
+//		
+//	// Checks upwards
+//	if (currentPosition - ROW_LENGTH > -1) 
+//		if (board[currentPosition - 9] == ' ') 
+//			return true; 
+//		
+//	// Checks right (Makes sure the rightmost column can't go right)
+//	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH)  
+//		if (board[currentPosition + 1] == ' ') 
+//			return true; 
+//		
+//	// Checks left (Makes sure the leftmost column can't go left)
+//	if ((currentPosition % ROW_LENGTH) != 0)  
+//		if (board[currentPosition - 1] == ' ') 
+//			return true; 
+//		
+//
+//	// IF CELL IS BLACK (DIAGONAL CHECKS)
+//	if (currentPosition % 2 == 0) {
+//
+//		// Checks topleft
+//		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) 
+//			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') 
+//				return true;
+//			
+//		// Checks topright
+//		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
+//			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') 
+//				return true;
+//			
+//		// Checks bottomleft
+//		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) 
+//			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') 
+//				return true;
+//			
+//		// Checks bottomright
+//		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
+//			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') 
+//				return true;
+//
+//	}
+//
+//	return false;
+//}
 
 
 // Checks whether it is a valid destination 
@@ -200,12 +255,14 @@ bool destinationCheck(int position, int destination) {
 
 
 bool adjacent(int position, int destination) {
-	if (position % ROW_LENGTH == 0) { // Have to make sure that the 1st column and last column cant go left or right
+
+	// Have to make sure that the 1st column and last column cant go left or right
+	if (position % ROW_LENGTH == 0) 
 		return(position + 1 == destination || position + 10 == destination || position - 9 == destination || position + 9 == destination || position - 8 == destination);
-	}
-	else if (position % ROW_LENGTH == ROW_LENGTH - 1) {
+	
+	else if (position % ROW_LENGTH == ROW_LENGTH - 1) 
 		return(position - 1 == destination || position - 10 == destination || position - 9 == destination || position + 9 == destination || position + 8 == destination);
-	}
+	
 	return(position + 1 == destination
 		|| position - 1 == destination
 		|| position - 10 == destination
@@ -217,62 +274,6 @@ bool adjacent(int position, int destination) {
 }
 
 
-void ProcessMoveRequest() {
-
-	bool completedTurn = false;
-	string answer;
-
-	do {
-		cout << endl << "Please enter move: ";
-		getline(cin, answer);
-
-		// Input Validation
-		if (answer.length() != 5) {
-			cout << "Invalid String, please try again." << endl;
-		}
-
-		else if (answer.at(2) != ' ') {
-			cout << "Invalid String, please try again." << endl;
-		}
-
-		// Process Input
-		else {
-			// Transforms the answer into two coordinates
-			int choIndex, destIndex;
-			string choice      = { answer.at(0), answer.at(1) };
-			string destination = { answer.at(3), answer.at(4) };
-
-			cout << "Position: " << choice << ", Destination: " << destination << endl;
-
-			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
-			if (IsValidChoice(choice) && IsValidChoice(destination)) {
-				choIndex = BoardToIndex(choice);
-				destIndex = BoardToIndex(destination);
-
-				// Checks if its the current player's token, if there's available move for choindex, and if the destination is valid.
-				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex,destIndex)) {
-
-					// Execute Attack Algorithm
-					attacking(choIndex, destIndex);
-
-					// Move attacking token forward/backward 
-					board[destIndex] = board[choIndex];
-					board[choIndex] = ' ';
-					completedTurn = true;
-				}
-
-				else 
-					cout << "This is an invalid move for the player. Please try again." << endl;
-			}
-			else 
-				cout << "Invalid positions, please try again." << endl;
-		}
-
-		PrintBoard();
-
-	} while (!completedTurn);
-}
-
 // Method to check whether green or red is playing.
 bool isValid(char color) {
 	if (isPlayerOne)
@@ -280,6 +281,7 @@ bool isValid(char color) {
 	else
 		return (color == 'R');
 }
+
 
 // Method to check whether the choice is in the board or not
 bool IsValidChoice(string choice) {
@@ -295,6 +297,7 @@ bool IsValidChoice(string choice) {
 
 	return false;
 }
+
 
 // Method to change the coordinates to arrayIndex
 int BoardToIndex(string choice) {
@@ -327,10 +330,6 @@ void attacking(int pos, int dest) {
 
 	// If there's no forward attack
 	if (targetColor == ' ' || targetColor == board[pos]) {
-
-		/*tempPosition = pos;
-		target       = pos - direction;
-		targetColor  = board[target];*/
 
 		direction *= -1;
 		tempPosition = pos;
