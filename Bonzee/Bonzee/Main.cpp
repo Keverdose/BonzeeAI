@@ -158,7 +158,7 @@ void ProcessMoveRequest() {
 
 				/*if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {*/
 
-				if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
+				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
 
 					// Execute Attack Algorithm
 					attacking(choIndex, destIndex);
@@ -183,61 +183,61 @@ void ProcessMoveRequest() {
 
 
 // Function that returns boolean to check whether the selected token has an available move
-//bool availableSpace(int currentPosition) {
-//
-//	// If the current position is out of bound
-//	if (currentPosition < 0 || currentPosition > 44) 
-//		return false;
-//
-//		
-//	// Checks downwards
-//	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) 
-//		if (board[currentPosition + ROW_LENGTH] == ' ') 
-//			return true; 
-//		
-//	// Checks upwards
-//	if (currentPosition - ROW_LENGTH > -1) 
-//		if (board[currentPosition - 9] == ' ') 
-//			return true; 
-//		
-//	// Checks right (Makes sure the rightmost column can't go right)
-//	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH)  
-//		if (board[currentPosition + 1] == ' ') 
-//			return true; 
-//		
-//	// Checks left (Makes sure the leftmost column can't go left)
-//	if ((currentPosition % ROW_LENGTH) != 0)  
-//		if (board[currentPosition - 1] == ' ') 
-//			return true; 
-//		
-//
-//	// IF CELL IS BLACK (DIAGONAL CHECKS)
-//	if (currentPosition % 2 == 0) {
-//
-//		// Checks topleft
-//		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) 
-//			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') 
-//				return true;
-//			
-//		// Checks topright
-//		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
-//			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') 
-//				return true;
-//			
-//		// Checks bottomleft
-//		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) 
-//			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') 
-//				return true;
-//			
-//		// Checks bottomright
-//		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
-//			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') 
-//				return true;
-//
-//	}
-//
-//	return false;
-//}
+bool availableSpace(int currentPosition) {
+
+	// If the current position is out of bound
+	if (currentPosition < 0 || currentPosition > 44) 
+		return false;
+
+		
+	// Checks downwards
+	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) 
+		if (board[currentPosition + ROW_LENGTH] == ' ') 
+			return true; 
+		
+	// Checks upwards
+	if (currentPosition - ROW_LENGTH > -1) 
+		if (board[currentPosition - 9] == ' ') 
+			return true; 
+		
+	// Checks right (Makes sure the rightmost column can't go right)
+	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH)  
+		if (board[currentPosition + 1] == ' ') 
+			return true; 
+		
+	// Checks left (Makes sure the leftmost column can't go left)
+	if ((currentPosition % ROW_LENGTH) != 0)  
+		if (board[currentPosition - 1] == ' ') 
+			return true; 
+		
+
+	// IF CELL IS BLACK (DIAGONAL CHECKS)
+	if (currentPosition % 2 == 0) {
+
+		// Checks topleft
+		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) 
+			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') 
+				return true;
+			
+		// Checks topright
+		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
+			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') 
+				return true;
+			
+		// Checks bottomleft
+		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) 
+			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') 
+				return true;
+			
+		// Checks bottomright
+		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
+			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') 
+				return true;
+
+	}
+
+	return false;
+}
 
 
 // Checks whether it is a valid destination 
