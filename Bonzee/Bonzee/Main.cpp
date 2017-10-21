@@ -78,7 +78,6 @@ int main() {
 		
 		PrintBoard();
 		ProcessMoveRequest();
-		cin.get();
 		isPlayerOne= !isPlayerOne;
 	}
 
