@@ -36,7 +36,7 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 char board[MAX_BOARD_SIZE] = {
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
+	' ', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
@@ -63,7 +63,7 @@ bool destinationCheck(int, int);
 int BoardToIndex(string);
 void attacking(int, int);
 bool adjacent(int, int);
-bool checkBounds(int);
+bool checkBackwardAttack(int, int);
 void tokenCountUpdate();
 
 
@@ -337,7 +337,7 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	//if (checkBounds(dest) || targetColor == ' ' || targetColor == board[pos]) {
+	//if (checkBackwardAttack(pos, dest) || targetColor == ' ' || targetColor == board[pos]) {
 	if (targetColor == ' ' || targetColor == board[pos]) {
 		direction *= -1;
 		tempPosition = pos;
@@ -347,7 +347,7 @@ void attacking(int pos, int dest) {
 	
 	// Begin attack loop
 	if (board[pos] != targetColor) {
-		while (target <= MAX_BOARD_SIZE && target >= 0 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
+		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
 			board[target] = ' ';
 			tempPosition = target;
 			target += direction;
@@ -359,11 +359,9 @@ void attacking(int pos, int dest) {
 
 
 // Checks if the destination cell is on the outter edge (Backward attack only)
-bool checkBounds(int destinationIndex) {
-	return(destinationIndex % ROW_LENGTH == 8 
-		|| destinationIndex % ROW_LENGTH == 0
-		|| destinationIndex <= ROW_LENGTH 
-		|| destinationIndex >= (MAX_BOARD_SIZE - ROW_LENGTH));
+bool checkBackwardAttack(int position, int destinationIndex) {
+	return( (destinationIndex % ROW_LENGTH == 8 || destinationIndex % ROW_LENGTH == 0 || destinationIndex <= ROW_LENGTH || destinationIndex >= (MAX_BOARD_SIZE - ROW_LENGTH)) 
+		&&  ((position > ROW_LENGTH || position < (MAX_BOARD_SIZE - ROW_LENGTH)) && (position % ROW_LENGTH != 8 || position % ROW_LENGTH != 0))  );
 }
 
 
