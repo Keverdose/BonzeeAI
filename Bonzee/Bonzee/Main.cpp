@@ -338,16 +338,19 @@ void attacking(int pos, int dest) {
 	}
 	
 	// Begin attack loop
-	while (target < 45 && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
-		board[target] = ' ';
-		tempPosition = target;
-		target += direction;
+	if (board[pos] != targetColor) {
+		while (target < 45 && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
+			board[target] = ' ';
+			tempPosition = target;
+			target += direction;
 
-		tokenCountUpdate();
+			tokenCountUpdate();
+		}
 	}
 	
 
 }
+
 
 // Decrements token count depending on player's turn
 void tokenCountUpdate() {

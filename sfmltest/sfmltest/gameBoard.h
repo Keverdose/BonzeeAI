@@ -1,14 +1,29 @@
 #pragma once
+#include <algorithm>
+#include <SFML\Graphics.hpp>
 class gameBoard
 {
 public:
+	// Default constructor
 	gameBoard();
+
+	// Destructor
 	~gameBoard();
 
-	//Defines the board size and each cell size
-	enum{BOARD_WIDTH = 9, BOARD_HEIGHT = 5, CELL_SIZE = 50 };
-	// A status to see if the baord is occupied
-	enum BoardStatus{EMPTY, OCCUPIED};
+	// gameBoard constructor
+	gameBoard(int wsizex, int wsizey, sf::RenderWindow* window);
 
+	// Draw the gameboard onto the window
+	void draw();
+	
+	// Mutators
+	void reSize(int wsizex, int wsizey);
+
+private:
+	int length;
+	int offsetx;
+	int offsety;
+	bool white = false;
+	sf::RenderWindow* window;
 };
 
