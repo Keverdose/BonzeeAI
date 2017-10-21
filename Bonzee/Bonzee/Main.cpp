@@ -9,12 +9,17 @@ using std::string;
 
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
-static const int ROW_LENGTH = 9;
-static const int COLUMN_LENGTH = 5;
+static const int EMPTY_BOARD    = 0;
+static const int ROW_LENGTH     = 9;
+static const int COLUMN_LENGTH  = 5;
 static const int MAX_PIECES_NUM = 22;
+static const int ASCII_LETTER_OFFSET = 48;
+
+
+
 
 static int greenCounter = MAX_PIECES_NUM;
-static int redCounter = MAX_PIECES_NUM;
+static int redCounter   = MAX_PIECES_NUM;
 static bool isPlayerOne = true;
 
 /* BOARD LAYOUT:
@@ -93,7 +98,7 @@ int main() {
 
 // Function to check if game is over or not.
 bool isGameOver() {
-	return (greenCounter <= 0 || redCounter <= 0);
+	return (greenCounter <= EMPTY_BOARD || redCounter <= EMPTY_BOARD);
 }
 
 
@@ -156,9 +161,6 @@ void ProcessMoveRequest() {
 				destIndex = BoardToIndex(destination);
 
 				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-
-				/*if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {*/
-
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
 
 					// Execute Attack Algorithm
@@ -187,7 +189,7 @@ void ProcessMoveRequest() {
 bool availableSpace(int currentPosition) {
 
 	// If the current position is out of bound
-	if (currentPosition < 0 || currentPosition > 44) 
+	if (currentPosition < EMPTY_BOARD || currentPosition > (MAX_BOARD_SIZE - 1)) 
 		return false;
 
 		
@@ -198,7 +200,7 @@ bool availableSpace(int currentPosition) {
 		
 	// Checks upwards
 	if (currentPosition - ROW_LENGTH > -1) 
-		if (board[currentPosition - 9] == ' ') 
+		if (board[currentPosition - ROW_LENGTH] == ' ') 
 			return true; 
 		
 	// Checks right (Makes sure the rightmost column can't go right)
@@ -259,19 +261,27 @@ bool adjacent(int position, int destination) {
 
 	// Have to make sure that the 1st column and last column cant go left or right
 	if (position % ROW_LENGTH == 0) 
-		return(position + 1 == destination || position + 10 == destination || position - 9 == destination || position + 9 == destination || position - 8 == destination);
+		return(position + 1 == destination 
+			|| position + ROW_LENGTH + 1 == destination 
+			|| position - ROW_LENGTH == destination 
+			|| position + ROW_LENGTH == destination 
+			|| position - ROW_LENGTH - 1 == destination);
 	
 	else if (position % ROW_LENGTH == ROW_LENGTH - 1) 
-		return(position - 1 == destination || position - 10 == destination || position - 9 == destination || position + 9 == destination || position + 8 == destination);
+		return(position - 1 == destination 
+			|| position - ROW_LENGTH + 1 == destination 
+			|| position - ROW_LENGTH == destination 
+			|| position + ROW_LENGTH == destination 
+			|| position + ROW_LENGTH -1 == destination);
 	
 	return(position + 1 == destination
 		|| position - 1 == destination
-		|| position - 10 == destination
-		|| position + 10 == destination
-		|| position - 9 == destination
-		|| position + 9 == destination
-		|| position - 8 == destination
-		|| position + 8 == destination);
+		|| position - ROW_LENGTH + 1 == destination
+		|| position + ROW_LENGTH + 1 == destination
+		|| position - ROW_LENGTH == destination
+		|| position + ROW_LENGTH == destination
+		|| position - ROW_LENGTH - 1 == destination
+		|| position + ROW_LENGTH - 1 == destination);
 }
 
 
@@ -292,7 +302,7 @@ bool IsValidChoice(string choice) {
 	char inputChar = choice.at(0);
 
 	if (inputChar == 'a' || inputChar == 'b' || inputChar == 'c' || inputChar == 'd' || inputChar == 'e') {
-		if ((int)choice.at(1) - 48 > 0 && (int)choice.at(1) - 48 <= 9)  
+		if ((int)choice.at(1) - ASCII_LETTER_OFFSET > 0 && (int)choice.at(1) - ASCII_LETTER_OFFSET <= ROW_LENGTH)
 			return true; 
 	}
 
@@ -317,21 +327,20 @@ int BoardToIndex(string choice) {
 			break;
 	}
 
-	return (offset * ROW_LENGTH + (int)choice.at(1) - 48 - 1);
+	return (offset * ROW_LENGTH + (int)choice.at(1) - ASCII_LETTER_OFFSET - 1);
 }
 
 // Method to process the attacking
 void attacking(int pos, int dest) {
-	// to-do Check the pos's color, check if dest + direction is opposite color, if so delete -> Loop until out of bounds of array (Wary of left and right column)
 
+	// Forward Attack 
 	int direction    = dest - pos;
 	int tempPosition = dest;
 	int target       = dest + direction;
 	char targetColor = board[target];
 
-	// If there's no forward attack
+	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
 	if (checkBounds(dest) || targetColor == ' ' || targetColor == board[pos]) {
-
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
@@ -340,7 +349,7 @@ void attacking(int pos, int dest) {
 	
 	// Begin attack loop
 	if (board[pos] != targetColor) {
-		while (target < 45 && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
+		while (target <= MAX_BOARD_SIZE && target >= 0 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
 			board[target] = ' ';
 			tempPosition = target;
 			target += direction;
@@ -348,16 +357,15 @@ void attacking(int pos, int dest) {
 			tokenCountUpdate();
 		}
 	}
-	
-
 }
+
 
 // Checks if the destination cell is on the outter edge (Backward attack only)
 bool checkBounds(int destinationIndex) {
-	return(destinationIndex % 9 == 8 
-		|| destinationIndex % 9 == 0
-		|| destinationIndex <= 9 
-		|| destinationIndex >= 36);
+	return(destinationIndex % ROW_LENGTH == 8 
+		|| destinationIndex % ROW_LENGTH == 0
+		|| destinationIndex <= ROW_LENGTH 
+		|| destinationIndex >= (MAX_BOARD_SIZE - ROW_LENGTH));
 }
 
 
