@@ -1,11 +1,13 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 // -- Namespaces
 using std::cout;
 using std::endl;
 using std::cin;
 using std::string;
+using std::transform;
 
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
@@ -36,7 +38,7 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 char board[MAX_BOARD_SIZE] = {
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-	' ', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
@@ -128,13 +130,12 @@ void ProcessMoveRequest() {
 	do {
 
 		if (isPlayerOne)
-			cout << "Player One, ";
-
+			cout << "Player One, Please enter move: ";
 		else
-			cout << "Player Two, ";
+			cout << "Player Two, Please enter move: ";
 
-		cout << "Please enter move: ";
 		getline(cin, answer);
+		transform(answer.begin(), answer.end(), answer.begin(), ::tolower); // Transforms input into lowercase 
 
 		// Input Validation
 		if (answer.length() != 5)
