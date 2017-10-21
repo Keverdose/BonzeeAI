@@ -16,7 +16,7 @@ static const int MAX_PIECES_NUM = 22;
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter = MAX_PIECES_NUM;
 // static const enum Color { R = 'R', G = 'G', E = ' ' };
-static bool player = true;
+static bool isPlayerOne = true;
 
 /* BOARD LAYOUT:
 	1  2  3  4  5  6  7  8  9
@@ -50,7 +50,7 @@ char board[MAX_BOARD_SIZE] = {
 /*char winOneMoveBoard[MAX_BOARD_SIZE] = {
 	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
 	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	'G', 'G', 'R', 'G', ' ', 'R', 'R', 'R', ' ',
+	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };*/
 
@@ -68,35 +68,39 @@ bool adjacent(int, int);
 
 
 int main() {
-	while (!isGameOver())
-	{
-		if (player){
+
+	while (!isGameOver()) {
+		if (isPlayerOne)
 			cout << "Player One's Turn\n\n";
-		}
-		else{
+		
+		else
 			cout << "Player Two's Turn\n\n";
-		}
+		
 		PrintBoard();
 		ProcessMoveRequest();
 		cin.get();
-		player = !player;
+		isPlayerOne= !isPlayerOne;
 	}
 
+	// Post Game Display
 	if (greenCounter <= 0)
 		cout << "Game Over Red Wins!";
 
 	else if (redCounter <= 0)
 		cout << "Game Over Green Wins!";
+
 	cin.get();
 }
 
+
 // Function to check if game is over or not.
-bool isGameOver()
-{
+bool isGameOver() {
 	return (greenCounter <= 0 || redCounter <= 0);
 }
+
+
 // Function to Print Current Board Configuration
-void PrintBoard(){
+void PrintBoard() {
 
 	cout << " ============================================================ " << endl;
 	cout << "\n       1     2     3     4     5     6     7     8     9";
@@ -112,9 +116,9 @@ void PrintBoard(){
 
 		// Prints Content of the Line 
 		if (i % 2 == 0)
-			cout << " [ " << board[i] << " ]";
+			cout << " [ " << board[i] << " ]";  // Black Square 
 		else
-			cout << " ( " << board[i] << " )";
+			cout << " ( " << board[i] << " )";  // White Square
 		
 	}
 
@@ -179,15 +183,20 @@ bool availableSpace(int currentPosition) {
 	return false;
 }
 
+
 // Checks whether it is a valid destination 
 bool destinationCheck(int position, int destination) {
+
 	// If cell occupied, return false;
-	if (board[destination] != ' ') { return false; }
+	if (board[destination] != ' ') 
+		return false; 
+
 	//Else check if the cell is adjacent to position.
-	else {
+	else 
 		return adjacent(position, destination);
-	}
 }
+
+
 
 bool adjacent(int position, int destination) {
 	if (position % ROW_LENGTH == 0) { // Have to make sure that the 1st column and last column cant go left or right
@@ -206,68 +215,83 @@ bool adjacent(int position, int destination) {
 		|| position + 8 == destination);
 }
 
+
 void ProcessMoveRequest() {
+
 	bool completedTurn = false;
 	string answer;
-	do
-	{
+
+	do {
 		cout << endl << "Please enter move: ";
 		getline(cin, answer);
-		// Checks if answer is legit
+
+		// Input Validation
 		if (answer.length() != 5) {
 			cout << "Invalid String, please try again." << endl;
 		}
+
 		else if (answer.at(2) != ' ') {
 			cout << "Invalid String, please try again." << endl;
 		}
+
+		// Process Input
 		else {
 			// Transforms the answer into two coordinates
-			string choice, destination;
 			int choIndex, destIndex;
-			choice = { answer.at(0),answer.at(1) };
-			destination = { answer.at(3) , answer.at(4) };
+			string choice      = { answer.at(0), answer.at(1) };
+			string destination = { answer.at(3), answer.at(4) };
+
 			cout << "Position: " << choice << ", Destination: " << destination << endl;
+
 			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
 			if (IsValidChoice(choice) && IsValidChoice(destination)) {
 				choIndex = BoardToIndex(choice);
 				destIndex = BoardToIndex(destination);
+
 				// Checks if its the current player's token, if there's available move for choindex, and if the destination is valid.
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex,destIndex)) {
+
+					// Execute Attack Algorithm
 					attacking(choIndex, destIndex);
+
+					// Move attacking token forward/backward 
 					board[destIndex] = board[choIndex];
 					board[choIndex] = ' ';
 					completedTurn = true;
 				}
-				else {
+
+				else 
 					cout << "This is an invalid move for the player. Please try again." << endl;
-				}
 			}
-			else {
+			else 
 				cout << "Invalid positions, please try again." << endl;
-			}
 		}
+
 		PrintBoard();
 
 	} while (!completedTurn);
 }
 
 // Method to check whether green or red is playing.
-bool isValid(char color)
-{
-	if (player){
+bool isValid(char color) {
+	if (isPlayerOne)
 		return (color == 'G');
-	}
-	else{
+	else
 		return (color == 'R');
-	}
 }
 
 // Method to check whether the choice is in the board or not
 bool IsValidChoice(string choice) {
-	if (choice == "") { return false; }
-	if (choice.at(0) == 'a' || choice.at(0) == 'b' || choice.at(0) == 'c' || choice.at(0) == 'd' || choice.at(0) == 'e') {
-		if ((int)choice.at(1) - 48 > 0 && (int)choice.at(1) - 48 <= 9) { return true; }
+	if (choice == "") 
+		return false; 
+
+	char inputChar = choice.at(0);
+
+	if (inputChar == 'a' || inputChar == 'b' || inputChar == 'c' || inputChar == 'd' || inputChar == 'e') {
+		if ((int)choice.at(1) - 48 > 0 && (int)choice.at(1) - 48 <= 9)  
+			return true; 
 	}
+
 	return false;
 }
 
@@ -275,20 +299,20 @@ bool IsValidChoice(string choice) {
 int BoardToIndex(string choice) {
 	char row = choice.at(0);
 	int offset;
-	switch (tolower(row))
-	{
-	case 'a': offset = 0;
-		break;
-	case 'b': offset = 1;
-		break;
-	case 'c': offset = 2;
-		break;
-	case 'd': offset = 3;
-		break;
-	case 'e': offset = 4;
-		break;
+	switch (tolower(row)) {
+		case 'a': offset = 0;
+			break;
+		case 'b': offset = 1;
+			break;
+		case 'c': offset = 2;
+			break;
+		case 'd': offset = 3;
+			break;
+		case 'e': offset = 4;
+			break;
 	}
-	return (offset*ROW_LENGTH + (int)choice.at(1)-48 - 1);
+
+	return (offset * ROW_LENGTH + (int)choice.at(1) - 48 - 1);
 }
 
 // Method to process the attacking
@@ -308,7 +332,7 @@ void attacking(int pos, int dest) {
 			board[attacked] = ' ';
 			tempPosition = attacked;
 			attacked -= direction;
-			if (player) {
+			if (isPlayerOne) {
 				redCounter--;
 			}
 			else {
@@ -316,6 +340,7 @@ void attacking(int pos, int dest) {
 			}
 		}
 	}
+	
 	// If it's forward attack
 	else{
 		while (attacked < 45 && attacked > -1 && (posColor == board[attacked]) && adjacent(tempPosition, attacked)) {
@@ -323,7 +348,7 @@ void attacking(int pos, int dest) {
 			tempPosition = attacked;
 			attacked += direction;
 
-			if (player) {
+			if (isPlayerOne) {
 				redCounter--;
 			}
 			else {
