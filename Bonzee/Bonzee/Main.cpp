@@ -44,15 +44,15 @@ char board[MAX_BOARD_SIZE] = {
 
 
 // Board setting to win in one move
-/*char board[MAX_BOARD_SIZE] = {
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
-	
-redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
-	*/
+//char board[MAX_BOARD_SIZE] = {
+//	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+//	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+//	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
+//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
+//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+//	
+//redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
+//	
 
 // -- Function definitions
 void PrintBoard();
@@ -70,6 +70,8 @@ void tokenCountUpdate();
 
 int main() {
 
+	
+
 	while (!isGameOver()) {
 		
 		PrintBoard();
@@ -79,11 +81,15 @@ int main() {
 	}
 
 	// Post Game Display
-	if (greenCounter <= 0)
+	if (greenCounter <= 0) {
+		PrintBoard();
 		cout << "Game Over Red Wins!";
+	}
 
-	else if (redCounter <= 0)
+	else if (redCounter <= 0) {
+		PrintBoard();
 		cout << "Game Over Green Wins!";
+	}
 
 	cin.get();
 }
