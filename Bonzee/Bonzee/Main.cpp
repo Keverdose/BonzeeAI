@@ -65,6 +65,7 @@ bool destinationCheck(int, int);
 int BoardToIndex(string);
 void attacking(int, int);
 bool adjacent(int, int);
+void tokenCountUpdate();
 
 
 int main() {
@@ -318,44 +319,41 @@ int BoardToIndex(string choice) {
 // Method to process the attacking
 void attacking(int pos, int dest) {
 	// to-do Check the pos's color, check if dest + direction is opposite color, if so delete -> Loop until out of bounds of array (Wary of left and right column)
-	int direction = dest - pos;
+
+	int direction    = dest - pos;
 	int tempPosition = dest;
-	int attacked = dest + direction;
-	char posColor = board[attacked];
+	int target       = dest + direction;
+	char targetColor = board[target];
 
 	// If there's no forward attack
-	if (board[attacked] == ' ' || board[attacked] == board[pos]) {
-		attacked = pos - direction;
+	if (targetColor == ' ' || targetColor == board[pos]) {
+
+		/*tempPosition = pos;
+		target       = pos - direction;
+		targetColor  = board[target];*/
+
+		direction *= -1;
 		tempPosition = pos;
-		posColor = board[attacked];
-		while (attacked < 45 && attacked > -1 && posColor == board[attacked] && adjacent(tempPosition, attacked)) {
-			board[attacked] = ' ';
-			tempPosition = attacked;
-			attacked -= direction;
-			if (isPlayerOne) {
-				redCounter--;
-			}
-			else {
-				greenCounter--;
-			}
-		}
+		target       = pos + direction;
+		targetColor  = board[target];
 	}
 	
-	// If it's forward attack
-	else{
-		while (attacked < 45 && attacked > -1 && (posColor == board[attacked]) && adjacent(tempPosition, attacked)) {
-			board[attacked] = ' ';
-			tempPosition = attacked;
-			attacked += direction;
+	// Begin attack loop
+	while (target < 45 && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
+		board[target] = ' ';
+		tempPosition = target;
+		target += direction;
 
-			if (isPlayerOne) {
-				redCounter--;
-			}
-			else {
-				greenCounter--;
-			}
-		}
-
+		tokenCountUpdate();
 	}
+	
 
+}
+
+// Decrements token count depending on player's turn
+void tokenCountUpdate() {
+	if (isPlayerOne) 
+		redCounter--;    // Decrement red token count
+	else 
+		greenCounter--;  // Decrement green token count
 }
