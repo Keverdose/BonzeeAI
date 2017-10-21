@@ -15,9 +15,6 @@ static const int COLUMN_LENGTH  = 5;
 static const int MAX_PIECES_NUM = 22;
 static const int ASCII_LETTER_OFFSET = 48;
 
-
-
-
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
 static bool isPlayerOne = true;
@@ -52,7 +49,7 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 	
-redCounter = 3;
+redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
 	*/
 
 // -- Function definitions
@@ -340,7 +337,8 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (checkBounds(dest) || targetColor == ' ' || targetColor == board[pos]) {
+	//if (checkBounds(dest) || targetColor == ' ' || targetColor == board[pos]) {
+	if (targetColor == ' ' || targetColor == board[pos]) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
