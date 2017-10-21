@@ -338,7 +338,7 @@ void attacking(int pos, int dest) {
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
 	//if (checkBounds(dest) || targetColor == ' ' || targetColor == board[pos]) {
-	if (targetColor == ' ' || targetColor == board[pos]) {
+	if (targetColor == ' ' || targetColor == board[pos] || target < 0 || target > 45) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
