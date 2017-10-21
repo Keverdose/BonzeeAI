@@ -63,22 +63,16 @@ bool destinationCheck(int, int);
 int BoardToIndex(string);
 void attacking(int, int);
 bool adjacent(int, int);
-bool checkBackwardAttack(int, int);
 void tokenCountUpdate();
 
 
 int main() {
 
 	while (!isGameOver()) {
-		if (isPlayerOne)
-			cout << "Player One's Turn\n\n";
-		
-		else
-			cout << "Player Two's Turn\n\n";
 		
 		PrintBoard();
 		ProcessMoveRequest();
-		cin.get();
+		// cin.get();
 		isPlayerOne= !isPlayerOne;
 	}
 
@@ -102,7 +96,7 @@ bool isGameOver() {
 // Function to Print Current Board Configuration
 void PrintBoard() {
 
-	cout << " ============================================================ " << endl;
+	cout << "\n\n ============================================================ " << endl;
 	cout << "\n       1     2     3     4     5     6     7     8     9";
 
 	char startLetter = 'A';
@@ -132,7 +126,14 @@ void ProcessMoveRequest() {
 	string answer;
 
 	do {
-		cout << endl << "Please enter move: ";
+
+		if (isPlayerOne)
+			cout << "Player One, ";
+
+		else
+			cout << "Player Two, ";
+
+		cout << "Please enter move: ";
 		getline(cin, answer);
 
 		// Input Validation
@@ -176,7 +177,7 @@ void ProcessMoveRequest() {
 				cout << "Invalid positions, please try again." << endl;
 		}
 
-		PrintBoard();
+		// PrintBoard();
 
 	} while (!completedTurn);
 }
@@ -327,6 +328,7 @@ int BoardToIndex(string choice) {
 	return (offset * ROW_LENGTH + (int)choice.at(1) - ASCII_LETTER_OFFSET - 1);
 }
 
+
 // Method to process the attacking
 void attacking(int pos, int dest) {
 
@@ -337,8 +339,7 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	//if (checkBackwardAttack(pos, dest) || targetColor == ' ' || targetColor == board[pos]) {
-	if (targetColor == ' ' || targetColor == board[pos]) {
+	if (target < 0 || target > 45 || targetColor == ' ' || targetColor == board[pos] ) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
@@ -355,13 +356,6 @@ void attacking(int pos, int dest) {
 			tokenCountUpdate();
 		}
 	}
-}
-
-
-// Checks if the destination cell is on the outter edge (Backward attack only)
-bool checkBackwardAttack(int position, int destinationIndex) {
-	return( (destinationIndex % ROW_LENGTH == 8 || destinationIndex % ROW_LENGTH == 0 || destinationIndex <= ROW_LENGTH || destinationIndex >= (MAX_BOARD_SIZE - ROW_LENGTH)) 
-		&&  ((position > ROW_LENGTH || position < (MAX_BOARD_SIZE - ROW_LENGTH)) && (position % ROW_LENGTH != 8 || position % ROW_LENGTH != 0))  );
 }
 
 
