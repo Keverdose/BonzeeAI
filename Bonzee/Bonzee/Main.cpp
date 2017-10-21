@@ -61,6 +61,7 @@ bool destinationCheck(int, int);
 int BoardToIndex(string);
 void attacking(int, int);
 bool adjacent(int, int);
+bool checkBounds(int);
 void tokenCountUpdate();
 
 
@@ -329,7 +330,7 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// If there's no forward attack
-	if (targetColor == ' ' || targetColor == board[pos]) {
+	if (checkBounds(dest) || targetColor == ' ' || targetColor == board[pos]) {
 
 		direction *= -1;
 		tempPosition = pos;
@@ -349,6 +350,14 @@ void attacking(int pos, int dest) {
 	}
 	
 
+}
+
+// Checks if the destination cell is on the outter edge (Backward attack only)
+bool checkBounds(int destinationIndex) {
+	return(destinationIndex % 9 == 8 
+		|| destinationIndex % 9 == 0
+		|| destinationIndex <= 9 
+		|| destinationIndex >= 36);
 }
 
 
