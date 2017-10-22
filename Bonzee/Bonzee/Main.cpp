@@ -37,10 +37,10 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 // -- char version of board
 char board[MAX_BOARD_SIZE] = {
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-	'R', 'R', 'R', ' ', 'R', 'R', 'R', 'R', 'R',
-	'G', 'G', 'G', ' ', ' ', 'R', ' ', ' ', 'G',
-	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', ' ',
-	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', 'G' };
+	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'G', ' ',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', ' ',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
 
 // Board setting to win in one move
@@ -277,7 +277,7 @@ bool destinationCheck(int position, int destination) {
 }
 
 
-
+// Method to check adjacency of positions
 bool adjacent(int position, int destination) {
 
 	// Have to make sure that the 1st column and last column cant go left or right
@@ -380,7 +380,7 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (target < 0 || target > 45 || targetColor == ' ' || targetColor == board[pos] ) {
+	if (target < 0 || target > 45 || targetColor == ' ' || targetColor == board[pos] || dest % ROW_LENGTH == 0 || dest % ROW_LENGTH == 8) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
@@ -389,22 +389,11 @@ void attacking(int pos, int dest) {
 	
 	// Begin attack loop
 	if (board[pos] != targetColor) {
-		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
-			if (board[target] != ' ')
-			{
-
-				board[target] = ' ';
-				tempPosition = target;
-				target += direction;
-
-				tokenCountUpdate();
-			}
-			else
-			{
-				board[target] = ' ';
-				tempPosition = target;
-				target += direction;
-			}
+		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target) && board[target] != ' ') {
+			board[target] = ' ';
+			tempPosition = target;
+			target += direction;
+			tokenCountUpdate();
 		}
 	}
 }
