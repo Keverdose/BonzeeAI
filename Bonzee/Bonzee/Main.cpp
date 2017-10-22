@@ -175,6 +175,7 @@ void ProcessMoveRequest() {
 					board[destIndex] = board[choIndex];
 					board[choIndex] = ' ';
 					completedTurn = true;
+					cout << "Reds: " << redCounter << ", Green: " << greenCounter << endl;
 				}
 
 				else
@@ -380,7 +381,7 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (target < 0 || target > 45 || targetColor == ' ' || targetColor == board[pos] || dest % ROW_LENGTH == 0 || dest % ROW_LENGTH == 8) {
+	if (target < 0 || target > 45 || targetColor == ' ' || targetColor == board[pos] || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -10 || direction == 8)) || (dest % ROW_LENGTH == 8 && (direction == +1 || direction == +10 || direction == -8))) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
