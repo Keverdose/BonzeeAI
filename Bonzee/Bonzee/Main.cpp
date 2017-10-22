@@ -281,54 +281,40 @@ bool destinationCheck(int position, int destination) {
 bool adjacent(int position, int destination) {
 
 	// Have to make sure that the 1st column and last column cant go left or right
-	if (position % ROW_LENGTH == 0) 
-		return(position + 1 == destination 
-			|| position + (ROW_LENGTH + 1) == destination 
-			|| position - ROW_LENGTH == destination 
-			|| position + ROW_LENGTH == destination 
-			|| position - (ROW_LENGTH - 1) == destination);
-	
-	else if (position % ROW_LENGTH == (ROW_LENGTH - 1)) 
-		return(position - 1 == destination 
-			|| position - (ROW_LENGTH + 1) == destination 
-			|| position - ROW_LENGTH == destination 
-			|| position + ROW_LENGTH == destination 
-			|| position + (ROW_LENGTH -1) == destination);
-
-	if (position % 2 == 0) { // If cell is black
+	if (position % 2 == 0) {
 		if (position % ROW_LENGTH == 0)
 			return(position + 1 == destination
-			|| position + ROW_LENGTH + 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination
-			|| position - ROW_LENGTH - 1 == destination);
+				|| position + (ROW_LENGTH + 1) == destination
+				|| position - ROW_LENGTH == destination
+				|| position + ROW_LENGTH == destination
+				|| position - (ROW_LENGTH - 1) == destination);
 
-		else if (position % ROW_LENGTH == ROW_LENGTH - 1)
+		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
 			return(position - 1 == destination
-			|| position - ROW_LENGTH + 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination
-			|| position + ROW_LENGTH - 1 == destination);
+				|| position - (ROW_LENGTH + 1) == destination
+				|| position - ROW_LENGTH == destination
+				|| position + ROW_LENGTH == destination
+				|| position + (ROW_LENGTH - 1) == destination);
 
 		return(position + 1 == destination
 			|| position - 1 == destination
-			|| position - ROW_LENGTH + 1 == destination
-			|| position + ROW_LENGTH + 1 == destination
+			|| position - (ROW_LENGTH + 1) == destination
+			|| position + (ROW_LENGTH + 1) == destination
 			|| position - ROW_LENGTH == destination
 			|| position + ROW_LENGTH == destination
-			|| position - ROW_LENGTH - 1 == destination
-			|| position + ROW_LENGTH - 1 == destination);
+			|| position - (ROW_LENGTH - 1) == destination
+			|| position + (ROW_LENGTH - 1) == destination);
 	}
-	else { // If cell is white
+	else {
 		if (position % ROW_LENGTH == 0)
 			return(position + 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination);
+				|| position - ROW_LENGTH == destination
+				|| position + ROW_LENGTH == destination);
 
-		else if (position % ROW_LENGTH == ROW_LENGTH - 1)
+		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
 			return(position - 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination);
+				|| position - ROW_LENGTH == destination
+				|| position + ROW_LENGTH == destination);
 
 		return(position + 1 == destination
 			|| position - 1 == destination
