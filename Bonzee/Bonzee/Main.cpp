@@ -83,12 +83,12 @@ int main() {
 	// Post Game Display
 	if (greenCounter <= 0) {
 		PrintBoard();
-		cout << "Game Over Red Wins!";
+		cout << "Game Over! Red Wins!";
 	}
 
 	else if (redCounter <= 0) {
 		PrintBoard();
-		cout << "Game Over Green Wins!";
+		cout << "Game Over! Green Wins!";
 	}
 
 	cin.get();
@@ -136,19 +136,19 @@ void ProcessMoveRequest() {
 	do {
 
 		if (isPlayerOne)
-			cout << "Player One, Please enter move: ";
+			cout << "Player One's Turn (Green). \nPlease enter move: ";
 		else
-			cout << "Player Two, Please enter move: ";
+			cout << "Player Two's Turn (Red). \nPlease enter move: ";
 
 		getline(cin, answer);
 		transform(answer.begin(), answer.end(), answer.begin(), ::tolower); // Transforms input into lowercase 
 
 		// Input Validation
 		if (answer.length() != 5)
-			cout << "Invalid String, please try again." << endl;
+			cout << "Invalid String given, please try again." << endl;
 
 		else if (answer.at(2) != ' ')
-			cout << "Invalid String, please try again." << endl;
+			cout << "Invalid String given, please try again." << endl;
 
 
 		// Process Input
@@ -158,7 +158,7 @@ void ProcessMoveRequest() {
 			string choice = { answer.at(0), answer.at(1) };
 			string destination = { answer.at(3), answer.at(4) };
 
-			cout << "Position: " << choice << ", Destination: " << destination << endl;
+			cout << "Position: " << choice << "; Destination: " << destination << endl;
 
 			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
 			if (IsValidChoice(choice) && IsValidChoice(destination)) {
@@ -178,7 +178,7 @@ void ProcessMoveRequest() {
 				}
 
 				else
-					cout << "This is an invalid move for the player. Please try again." << endl;
+					cout << "This is an invalid move. Please try again." << endl;
 			}
 			else
 				cout << "Invalid positions, please try again." << endl;
