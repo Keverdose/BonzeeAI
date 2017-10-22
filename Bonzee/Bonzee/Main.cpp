@@ -390,11 +390,21 @@ void attacking(int pos, int dest) {
 	// Begin attack loop
 	if (board[pos] != targetColor) {
 		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target)) {
-			board[target] = ' ';
-			tempPosition = target;
-			target += direction;
+			if (board[target] != ' ')
+			{
 
-			tokenCountUpdate();
+				board[target] = ' ';
+				tempPosition = target;
+				target += direction;
+
+				tokenCountUpdate();
+			}
+			else
+			{
+				board[target] = ' ';
+				tempPosition = target;
+				target += direction;
+			}
 		}
 	}
 }
