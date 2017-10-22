@@ -38,8 +38,8 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 char board[MAX_BOARD_SIZE] = {
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'G', ' ',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', ' ',
+	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
 
@@ -104,7 +104,7 @@ bool isGameOver() {
 // Function to Print Current Board Configuration
 void PrintBoard() {
 
-	cout << "\n\n ============================================================ " << endl;
+	cout << "\n\n ======================== B O N Z E E ======================= " << endl;
 	cout << "\n       1     2     3     4     5     6     7     8     9";
 
 	char startLetter = 'A';
@@ -141,7 +141,7 @@ void ProcessMoveRequest() {
 			cout << "Player Two's Turn (Red). \nPlease enter move: ";
 
 		getline(cin, answer);
-		transform(answer.begin(), answer.end(), answer.begin(), ::tolower); // Transforms input into lowercase 
+		transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
 
 		// Input Validation
 		if (answer.length() != 5)
@@ -158,6 +158,7 @@ void ProcessMoveRequest() {
 			string choice = { answer.at(0), answer.at(1) };
 			string destination = { answer.at(3), answer.at(4) };
 
+			cout << "\nBoard Update: " << endl;
 			cout << "Position: " << choice << "; Destination: " << destination << endl;
 
 			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
@@ -175,7 +176,7 @@ void ProcessMoveRequest() {
 					board[destIndex] = board[choIndex];
 					board[choIndex] = ' ';
 					completedTurn = true;
-					cout << "Reds: " << redCounter << ", Green: " << greenCounter << endl;
+					cout << "Red: " << redCounter << ", Green: " << greenCounter << endl;
 				}
 
 				else
@@ -341,7 +342,7 @@ bool IsValidChoice(string choice) {
 
 	char inputChar = choice.at(0);
 
-	if (inputChar == 'a' || inputChar == 'b' || inputChar == 'c' || inputChar == 'd' || inputChar == 'e') {
+	if (inputChar == 'A' || inputChar == 'B' || inputChar == 'C' || inputChar == 'D' || inputChar == 'E') {
 		if ((int)choice.at(1) - ASCII_LETTER_OFFSET > 0 && (int)choice.at(1) - ASCII_LETTER_OFFSET <= ROW_LENGTH)
 			return true; 
 	}
@@ -381,7 +382,7 @@ void attacking(int pos, int dest) {
 	char targetColor = board[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (target < 0 || target > 45 || targetColor == ' ' || targetColor == board[pos] || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -10 || direction == 8)) || (dest % ROW_LENGTH == 8 && (direction == +1 || direction == +10 || direction == -8))) {
+	if (target < 0 || target > MAX_BOARD_SIZE || targetColor == ' ' || targetColor == board[pos] || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -(ROW_LENGTH + 1) || direction == (ROW_LENGTH - 1) )) || (dest % ROW_LENGTH == (ROW_LENGTH - 1) && (direction == 1 || direction == (ROW_LENGTH + 1) || direction == -(ROW_LENGTH - 1)))) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
