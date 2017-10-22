@@ -37,10 +37,10 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 // -- char version of board
 char board[MAX_BOARD_SIZE] = {
 	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+	'R', 'R', 'R', ' ', 'R', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', ' ', ' ', 'R', ' ', ' ', 'G',
+	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', ' ',
+	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', 'G' };
 
 
 // Board setting to win in one move
@@ -199,48 +199,64 @@ bool availableSpace(int currentPosition) {
 
 		
 	// Checks downwards
-	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) 
-		if (board[currentPosition + ROW_LENGTH] == ' ') 
-			return true; 
+	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
+		if (board[currentPosition + ROW_LENGTH] == ' ') {
+			return true;
+		}
+	}
 		
 	// Checks upwards
-	if (currentPosition - ROW_LENGTH > -1) 
-		if (board[currentPosition - ROW_LENGTH] == ' ') 
-			return true; 
+	if (currentPosition - ROW_LENGTH > -1) {
+		if (board[currentPosition - ROW_LENGTH] == ' ') {
+			return true;
+		}
+	}
 		
 	// Checks right (Makes sure the rightmost column can't go right)
-	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH)  
-		if (board[currentPosition + 1] == ' ') 
-			return true; 
+	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+		if (board[currentPosition + 1] == ' ') {
+			return true;
+		}
+	}
 		
 	// Checks left (Makes sure the leftmost column can't go left)
-	if ((currentPosition % ROW_LENGTH) != 0)  
-		if (board[currentPosition - 1] == ' ') 
-			return true; 
+	if ((currentPosition % ROW_LENGTH) != 0) {
+		if (board[currentPosition - 1] == ' ') {
+			return true;
+		}
+	}
 		
 
 	// IF CELL IS BLACK (DIAGONAL CHECKS)
 	if (currentPosition % 2 == 0) {
 
 		// Checks topleft
-		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) 
-			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') 
+		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
+			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') {
 				return true;
+			}
+		}
 			
 		// Checks topright
-		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
-			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') 
+		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') {
 				return true;
+			}
+		}
 			
 		// Checks bottomleft
-		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) 
-			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') 
+		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
+			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') {
 				return true;
+			}
+		}
 			
 		// Checks bottomright
-		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) 
-			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') 
+		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') {
 				return true;
+			}
+		}
 
 	}
 
@@ -267,26 +283,26 @@ bool adjacent(int position, int destination) {
 	// Have to make sure that the 1st column and last column cant go left or right
 	if (position % ROW_LENGTH == 0) 
 		return(position + 1 == destination 
-			|| position + ROW_LENGTH + 1 == destination 
+			|| position + (ROW_LENGTH + 1) == destination 
 			|| position - ROW_LENGTH == destination 
 			|| position + ROW_LENGTH == destination 
-			|| position - ROW_LENGTH - 1 == destination);
+			|| position - (ROW_LENGTH - 1) == destination);
 	
-	else if (position % ROW_LENGTH == ROW_LENGTH - 1) 
+	else if (position % ROW_LENGTH == (ROW_LENGTH - 1)) 
 		return(position - 1 == destination 
-			|| position - ROW_LENGTH + 1 == destination 
+			|| position - (ROW_LENGTH + 1) == destination 
 			|| position - ROW_LENGTH == destination 
 			|| position + ROW_LENGTH == destination 
-			|| position + ROW_LENGTH -1 == destination);
+			|| position + (ROW_LENGTH -1) == destination);
 	
 	return(position + 1 == destination
 		|| position - 1 == destination
-		|| position - ROW_LENGTH + 1 == destination
-		|| position + ROW_LENGTH + 1 == destination
+		|| position - (ROW_LENGTH + 1) == destination
+		|| position + (ROW_LENGTH + 1) == destination
 		|| position - ROW_LENGTH == destination
 		|| position + ROW_LENGTH == destination
-		|| position - ROW_LENGTH - 1 == destination
-		|| position + ROW_LENGTH - 1 == destination);
+		|| position - (ROW_LENGTH - 1) == destination
+		|| position + (ROW_LENGTH - 1) == destination);
 }
 
 
