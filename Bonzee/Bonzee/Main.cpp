@@ -136,9 +136,9 @@ void ProcessMoveRequest() {
 	do {
 
 		if (isPlayerOne)
-			cout << "Player One's Turn (Green). \nPlease enter move: ";
+			cout << "Player One's Turn (Green). \n  Please enter move: ";
 		else
-			cout << "Player Two's Turn (Red). \nPlease enter move: ";
+			cout << "Player Two's Turn (Red). \n  Please enter move: ";
 
 		getline(cin, answer);
 		transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
@@ -159,7 +159,7 @@ void ProcessMoveRequest() {
 			string destination = { answer.at(3), answer.at(4) };
 
 			cout << "\nBoard Update: " << endl;
-			cout << "Position: " << choice << "; Destination: " << destination << endl;
+			cout << "  Position: " << choice << "; Destination: " << destination << endl;
 
 			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
 			if (IsValidChoice(choice) && IsValidChoice(destination)) {
@@ -176,7 +176,7 @@ void ProcessMoveRequest() {
 					board[destIndex] = board[choIndex];
 					board[choIndex] = ' ';
 					completedTurn = true;
-					cout << "Red: " << redCounter << ", Green: " << greenCounter << endl;
+					cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
 				}
 
 				else
