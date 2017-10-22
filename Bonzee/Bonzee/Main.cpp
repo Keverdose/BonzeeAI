@@ -294,15 +294,47 @@ bool adjacent(int position, int destination) {
 			|| position - ROW_LENGTH == destination 
 			|| position + ROW_LENGTH == destination 
 			|| position + (ROW_LENGTH -1) == destination);
-	
-	return(position + 1 == destination
-		|| position - 1 == destination
-		|| position - (ROW_LENGTH + 1) == destination
-		|| position + (ROW_LENGTH + 1) == destination
-		|| position - ROW_LENGTH == destination
-		|| position + ROW_LENGTH == destination
-		|| position - (ROW_LENGTH - 1) == destination
-		|| position + (ROW_LENGTH - 1) == destination);
+
+	if (position % 2 == 0) { // If cell is black
+		if (position % ROW_LENGTH == 0)
+			return(position + 1 == destination
+			|| position + ROW_LENGTH + 1 == destination
+			|| position - ROW_LENGTH == destination
+			|| position + ROW_LENGTH == destination
+			|| position - ROW_LENGTH - 1 == destination);
+
+		else if (position % ROW_LENGTH == ROW_LENGTH - 1)
+			return(position - 1 == destination
+			|| position - ROW_LENGTH + 1 == destination
+			|| position - ROW_LENGTH == destination
+			|| position + ROW_LENGTH == destination
+			|| position + ROW_LENGTH - 1 == destination);
+
+		return(position + 1 == destination
+			|| position - 1 == destination
+			|| position - ROW_LENGTH + 1 == destination
+			|| position + ROW_LENGTH + 1 == destination
+			|| position - ROW_LENGTH == destination
+			|| position + ROW_LENGTH == destination
+			|| position - ROW_LENGTH - 1 == destination
+			|| position + ROW_LENGTH - 1 == destination);
+	}
+	else { // If cell is white
+		if (position % ROW_LENGTH == 0)
+			return(position + 1 == destination
+			|| position - ROW_LENGTH == destination
+			|| position + ROW_LENGTH == destination);
+
+		else if (position % ROW_LENGTH == ROW_LENGTH - 1)
+			return(position - 1 == destination
+			|| position - ROW_LENGTH == destination
+			|| position + ROW_LENGTH == destination);
+
+		return(position + 1 == destination
+			|| position - 1 == destination
+			|| position - ROW_LENGTH == destination
+			|| position + ROW_LENGTH == destination);
+	}
 }
 
 
