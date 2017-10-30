@@ -50,9 +50,8 @@ char board[MAX_BOARD_SIZE] = {
 //	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
 //	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 //	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
-//	
-//redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
-//	
+	
+// redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
 
 // -- Function definitions
 void PrintBoard();
@@ -66,18 +65,21 @@ int BoardToIndex(string);
 void attacking(int, int);
 bool adjacent(int, int);
 void tokenCountUpdate();
-
+int Heuristic();
+int getRowIndex(int);
+int getColumnIndex(int);
 
 int main() {
 
-	
+	cout << Heuristic();
 
 	while (!isGameOver()) {
 		
 		PrintBoard();
 		ProcessMoveRequest();
 		// cin.get();
-		isPlayerOne= !isPlayerOne;
+		isPlayerOne = !isPlayerOne;
+		cout << Heuristic();
 	}
 
 	// Post Game Display
@@ -407,4 +409,69 @@ void tokenCountUpdate() {
 		redCounter--;    // Decrement red token count
 	else 
 		greenCounter--;  // Decrement green token count
+}
+
+int Heuristic(){
+	/*
+	THE HEURISTIC IS:
+	e(board) = 
+		100 x (SUM[1 to # green tokens left](horizontal index for the current green token visited))
+		+ 50 x (SUM[1 to # green tokens left](vertical index for the current green token visited))
+		- 100 x (SUM[1 to # red tokens left](horizontal index for the current red token visited))
+		- 50 x (SUM[1 to # red tokens left](vertical index for the current red token visited))
+	*/
+
+	// Vertical/Horizontal values for each color
+	int verticalGreenVal = 0, verticalRedVal = 0, horizontalGreenVal = 0, horizontalRedVal = 0;
+
+	// The counters
+	int visitedGreen = greenCounter;
+	int visitedRed = redCounter;
+
+	for (int i = 0; i < MAX_BOARD_SIZE; i++){
+		if (board[i] == 'G'){
+			visitedGreen--;
+			verticalGreenVal += getColumnIndex(i);
+			horizontalGreenVal += getRowIndex(i);
+		}
+		if (board[i] == 'R'){
+			visitedRed--;
+			verticalRedVal += getColumnIndex(i);
+			horizontalRedVal += getRowIndex(i);
+		}
+		if (visitedRed <= 0 && visitedGreen <= 0){
+			break;
+		}
+	}
+	
+	// Return the heuristic value
+	return (100 * horizontalGreenVal) + (50 * verticalGreenVal) - (100 * horizontalRedVal) - (50 * verticalRedVal);
+}
+
+// Takes in a board index and returns its row index # (i.e. 27 returns 4 since D = 4)
+int getRowIndex(int index){
+	float val = index / 9;
+	if (val == 0 || val < 1){
+		return 1; // A = 1
+	}
+	else if (val == 1 || val < 2){
+		return 2; // B = 2
+	}
+	else if (val == 2 || val < 3){
+		return 3; // C = 3
+	}
+	else if (val == 3 || val < 4){
+		return 4; // D = 4
+	}
+	else if (val == 4 || val < 5){
+		return 5; // E = 5
+	}
+	else{
+		return -1; // Error
+	}
+}
+
+// Takes in a board index and returns its column index # (i.e. 27 returns 1 because it's in the 1st column)
+int getColumnIndex(int index){
+	return index % 9 + 1;
 }
