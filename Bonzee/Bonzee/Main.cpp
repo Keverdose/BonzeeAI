@@ -103,7 +103,7 @@ bool isGameOver() {
 
 // Function to Print Current Board Configuration
 void PrintBoard() {
-
+	cout << "\n\nBlack Cells Denoted By: [ ]\nWhite Cells Denoted By: ( )";
 	cout << "\n\n ======================== B O N Z E E ======================= " << endl;
 	cout << "\n       1     2     3     4     5     6     7     8     9";
 
