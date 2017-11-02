@@ -486,7 +486,7 @@ int Heuristic(char* tempBoard){
 }
 
 // Takes in a board index and returns its row index # (i.e. 27 returns 4 since D = 4)
-// TODO make this into a struct
+// TODO make this into a struct to return both row and column index
 int getRowIndex(int index){
 	float val = index / 9;
 	
