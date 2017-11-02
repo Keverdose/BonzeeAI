@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 // -- Namespaces
 using std::cout;
@@ -20,6 +21,13 @@ static const int ASCII_LETTER_OFFSET = 48;
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
 static bool isPlayerOne = true;
+static std::vector<int> heuristicValue;
+
+struct moveString {
+	string start;
+	string destination;
+};
+
 
 /* BOARD LAYOUT:
 	1  2  3  4  5  6  7  8  9
@@ -35,21 +43,21 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 
 
 // -- char version of board
-//char board[MAX_BOARD_SIZE] = {
-//	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-//	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-//	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
-//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+char board[MAX_BOARD_SIZE] = {
+	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
 
 // Board setting to win in one move
-char board[MAX_BOARD_SIZE] = {
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+//char board[MAX_BOARD_SIZE] = {
+//	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+//	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+//	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
+//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
+//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 	
 // redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
 
@@ -68,6 +76,7 @@ void tokenCountUpdate();
 int Heuristic(char*);
 int getRowIndex(int);
 int getColumnIndex(int);
+string indexToBoard(int);
 
 int main() {
 
@@ -174,11 +183,8 @@ void ProcessMoveRequest() {
 					// Execute Attack Algorithm
 					attacking(choIndex, destIndex);
 
-					// Move attacking token forward/backward 
-					board[destIndex] = board[choIndex];
-					board[choIndex] = ' ';
 					completedTurn = true;
-					cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
+					cout << "  Red: " << redCounter << ", Green: " << greenCounter << ", HELLO:" <<  indexToBoard(choIndex) <<endl;
 				}
 
 				else
@@ -373,9 +379,41 @@ int BoardToIndex(string choice) {
 	return (offset * ROW_LENGTH + (int)choice.at(1) - ASCII_LETTER_OFFSET - 1);
 }
 
+// Method to transform an index to Board coordinates  <-- THIS IS FOR THE AI
+string indexToBoard(int index) {
+	int charVal = index / 9;
+	int columnValue = index % 9 + 1;
+	char rowValue;
+	// A = 0, B = 1, C = 2, D = 3, E = 4
+	if (charVal == 0) {
+		rowValue = 'a';
+	}
+	else if (charVal == 1) {
+		rowValue = 'b';
+	}
+	else if (charVal == 2) {
+		rowValue = 'c';
+	}
+	else if (charVal == 3) {
+		rowValue = 'd';
+	}
+	else if (charVal == 4) {
+		rowValue = 'e';
+	}
+	string temp = "";
+	temp += rowValue;
+	temp += std::to_string(index % 9 + 1);
+
+	return temp;
+}
+
 
 // Method to process the attacking
 void attacking(int pos, int dest) {
+
+	// Move attacking token forward/backward 
+	board[dest] = board[pos];
+	board[pos] = ' ';
 
 	// Forward Attack 
 	int direction    = dest - pos;
@@ -401,7 +439,6 @@ void attacking(int pos, int dest) {
 		}
 	}
 }
-
 
 // Decrements token count depending on player's turn
 void tokenCountUpdate() {
@@ -449,6 +486,7 @@ int Heuristic(char* tempBoard){
 }
 
 // Takes in a board index and returns its row index # (i.e. 27 returns 4 since D = 4)
+// TODO make this into a struct
 int getRowIndex(int index){
 	float val = index / 9;
 	
@@ -464,4 +502,14 @@ int getRowIndex(int index){
 // Takes in a board index and returns its column index # (i.e. 27 returns 1 because it's in the 1st column)
 int getColumnIndex(int index){
 	return (index % 9) + 1;
+}
+
+int alphaBetaMax(int alpha, int beta, int depthLevel) {
+
+	return 0;
+}
+
+int alphaBetaMin(int alpha, int beta, int depthLevel) {
+
+	return 0;
 }
