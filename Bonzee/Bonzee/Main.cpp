@@ -583,7 +583,8 @@ int minSearch(int depth, char* board, bool player) {
 			tempBoard[k] = board[k];
 		}
 		for (int i = 0; i < allMoves.size(); i++) {
-			return maxSearch(depth - 1, tempBoard, !player);
+			attacking(allMoves[i], tempBoard);
+			return maxSearch(depth - 1, tempBoard, !player); // not sure if its going to work
 		}
 	}
 
@@ -601,7 +602,8 @@ int maxSearch(int depth, char* board, bool player) {
 			tempBoard[k] = board[k];
 		}
 		for (int i = 0; i < allMoves.size(); i++) {
-			return minSearch(depth - 1, tempBoard, !player);
+			attacking(allMoves[i], tempBoard);
+			return minSearch(depth - 1, tempBoard, !player);   // not sure if its going to work
 		}
 	}
 }
