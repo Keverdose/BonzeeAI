@@ -75,7 +75,7 @@ bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
-void attacking(int, int, char*);
+void attacking(move, char*);
 bool adjacent(int, int);
 void tokenCountUpdate();
 int Heuristic(char*);
@@ -278,8 +278,11 @@ void ProcessMoveRequest() {
 				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
 
+					move userMove;
+					userMove.start = choIndex;
+					userMove.destination = destIndex;
 					// Execute Attack Algorithm
-					attacking(choIndex, destIndex, board);
+					attacking(userMove, board);
 
 					completedTurn = true;
 					cout << "  Red: " << redCounter << ", Green: " << greenCounter << ", HELLO:" <<  indexToBoard(choIndex) <<endl;
@@ -505,6 +508,8 @@ string indexToBoard(int index) {
 	return temp;
 }
 
+
+// Loops through the array to add all possible move given the player's token.
 vector<move> getAllMoves(char *tempBoard, bool player){
 	char token;
 	vector<move> allMoves;
@@ -521,8 +526,9 @@ vector<move> getAllMoves(char *tempBoard, bool player){
 				// Checks all adjacents
 				move temp;
 				temp.start = i;
-				for (int j = 0; j < .size(); j++ ) { // Loops through all available adjacents
-					temp.destination = j;
+				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard);
+				for (int j = 0; j < possibleMovesDestination.size(); j++ ) { // Loops through all available adjacents
+					temp.destination = possibleMovesDestination[j];
 					allMoves.push_back(temp);
 				}
 			}
@@ -531,27 +537,72 @@ vector<move> getAllMoves(char *tempBoard, bool player){
 	return allMoves;
 }
 
-// Implements minimax, and returns the best move the ai should take according.
+// Implements minimax, and returns the best move the ai should take according. 
 move getAiMove(int depth, char* board, bool playerMax) {
 	vector<move> allMoves = getAllMoves(board, playerMax);
+	char tempBoard[MAX_BOARD_SIZE];
+	move aiMove;
+	for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+		tempBoard[k] = board[k];
+	}
 	if (playerMax) {
-		for (int i = 0; allMoves.size(); i++) {
-			ProcessMoveRequest(allMoves[i]);
-			char tempBoard[MAX_BOARD_SIZE] = 
+		int highestValue = - 9999999;
+		for (int i = 0; i < allMoves.size(); i++) {
+			attacking(allMoves[i], tempBoard);
+			int value = maxSearch(depth - 1, tempBoard, !playerMax);
+			if (value > highestValue) {
+				highestValue = value;
+				aiMove = allMoves[i];
+			}
+
 		}
 	}
+	else if (!playerMax) {
+		int lowestValue = 9999999;
+		for (int i = 0; i < allMoves.size(); i++) {
+			attacking(allMoves[i], tempBoard);
+			int value = minSearch(depth - 1, tempBoard, !playerMax);
+			if (value < lowestValue) {
+				lowestValue = value;
+				aiMove = allMoves[i];
+			}
+		}
+	}
+	return aiMove; //Returns the ai's move.
 }
 
+// Minimize the win condition (Recursion)
 int minSearch(int depth, char* board, bool player) {
 	if (depth == 0 || getAllMoves(board, player).empty()) {
 		return Heuristic(board);
 	}
+	else {
+		vector<move> allMoves = getAllMoves(board, player);
+		char tempBoard[MAX_BOARD_SIZE];
+		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+			tempBoard[k] = board[k];
+		}
+		for (int i = 0; i < allMoves.size(); i++) {
+			return maxSearch(depth - 1, tempBoard, !player);
+		}
+	}
 
 }
 
+// Maximize the win condition (Recursion)
 int maxSearch(int depth, char* board, bool player) {
 	if (depth == 0 || getAllMoves(board, player).empty()) {
 		return Heuristic(board);
+	}
+	else {
+		vector<move> allMoves = getAllMoves(board, player);
+		char tempBoard[MAX_BOARD_SIZE];
+		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+			tempBoard[k] = board[k];
+		}
+		for (int i = 0; i < allMoves.size(); i++) {
+			return minSearch(depth - 1, tempBoard, !player);
+		}
 	}
 }
 
@@ -571,11 +622,15 @@ bool winningBoard(char* board) {
 }
 
 // Method to process the attacking
-void attacking(int pos, int dest, char* currentBoard) {
+void attacking(move inputMove, char* currentBoard) {
+
+	// Get the move indices
+	int dest = inputMove.destination;
+	int pos = inputMove.start;
 
 	// Move attacking token forward/backward 
-	board[dest] = board[pos];
-	board[pos] = ' ';
+	currentBoard[dest] = currentBoard[pos];
+	currentBoard[pos] = ' ';
 
 	// Forward Attack 
 	int direction    = dest - pos;
@@ -623,10 +678,6 @@ int Heuristic(char* tempBoard){
 	// Vertical/Horizontal Indexes values for each color
 	int verticalGreenVal = 0, verticalRedVal = 0, horizontalGreenVal = 0, horizontalRedVal = 0;
 
-	//// The counters
-	//int visitedGreen = greenCounter;
-	//int visitedRed = redCounter;
-
 	for (int i = 0; i < MAX_BOARD_SIZE; i++){
 		if (tempBoard[i] == 'G'){
 			/*visitedGreen--;*/
@@ -638,9 +689,6 @@ int Heuristic(char* tempBoard){
 			verticalRedVal += getColumnIndex(i);
 			horizontalRedVal += getRowIndex(i);
 		}
-		/*if (visitedRed <= 0 && visitedGreen <= 0){
-			break;
-		}*/
 	}
 	
 	// Return the heuristic value
