@@ -72,6 +72,7 @@ void tokenCountUpdate();
 int Heuristic(char*);
 int getRowIndex(int);
 int getColumnIndex(int);
+void generateMap(int, int, int);
 
 int main() {
 
