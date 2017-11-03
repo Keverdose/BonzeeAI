@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <map>
 #include <algorithm>
 #include <vector>
 
@@ -52,6 +54,7 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
+std::map<int, std::vector<int> > adjacentCells;
 
 // Board setting to win in one move
 //char board[MAX_BOARD_SIZE] = {
@@ -81,9 +84,36 @@ int getColumnIndex(int);
 string indexToBoard(int);
 bool winningBoard(char*);
 void getAllMoves(char*, vector<move>&, bool);
+void generateMap(int, int, int);
+
 
 
 int main() {
+
+	// Generate the Map for all indices
+	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+		generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH);
+	}
+
+	//// Print out map
+	//for (int j = 0; j < MAX_BOARD_SIZE; j++) {
+
+	//	cout << "Map[" << j << "] = ( ";
+
+	//	for (int k = 0; k < adjacentCells[j].size(); k++) {
+	//		cout << adjacentCells[j].at(k) << " ";
+	//	}
+
+	//	cout << ") " << endl;
+	//}
+
+
+	//std::vector<int> positions = checkPossibleMoves(23, board);
+
+	//for (int o = 0; o < positions.size(); o++) {
+	//	cout << "Possible Moves: " << positions.at(o) << endl;
+	//}
+
 
 	cout << Heuristic(board);
 
@@ -110,6 +140,69 @@ int main() {
 	cin.get();
 }
 
+// Generates the Map of all Adjacent Cells based on possible moves
+void generateMap(int index, int boardSize, int row_length) {
+
+	// Insert a new entry into the Map
+	adjacentCells.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
+
+	// Check Left Bound
+	if (index % row_length != 0) {
+
+		// Add Upper Left Diagonal Index
+		if ((index > row_length) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index - (row_length + 1));
+		}
+
+		// Add Lower Left Diagonal Index
+		if ((index < (boardSize - row_length)) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index + (row_length - 1));
+		}
+
+		// Add Left Index
+		 adjacentCells[index].push_back(index - 1);
+	}
+
+	// Check Right Bound
+	if ((index % (row_length)) != (row_length - 1)) {
+
+		// Add Upper Right Diagonal Index
+		if ((index > (row_length - 1)) && (index % 2 == 0)) {
+			adjacentCells[index].push_back((index - row_length) + 1);
+		}
+
+		// Add Lower Right Diagonal Index
+		if ((index < boardSize - row_length) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index + (row_length + 1));
+		}
+
+		// Add Right Index
+		adjacentCells[index].push_back(index + 1);
+	}
+
+	// Add Top Index
+	if (index > (row_length - 1) )
+		adjacentCells[index].push_back(index - row_length);
+
+	// Add Bottom Index
+	if (index < (boardSize - row_length))
+		adjacentCells[index].push_back(index + row_length);
+
+}
+
+
+// Check the possible moves at given index
+std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
+
+	std::vector<int> moves;
+
+	for (int i = 0; i < adjacentCells[index].size(); i++) {
+		if (updatedBoard[adjacentCells[index].at(i)] == ' ')
+			moves.push_back(adjacentCells[index].at(i));
+	}
+
+	return moves;
+}
 
 // Function to check if game is over or not.
 bool isGameOver() {
