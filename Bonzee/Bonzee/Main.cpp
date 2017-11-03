@@ -9,6 +9,7 @@ using std::endl;
 using std::cin;
 using std::string;
 using std::transform;
+using std::vector;
 
 // -- Variable definitions
 static const int MAX_BOARD_SIZE = 45;
@@ -23,9 +24,10 @@ static int redCounter   = MAX_PIECES_NUM;
 static bool isPlayerOne = true;
 static std::vector<int> heuristicValue;
 
-struct moveString {
-	string start;
-	string destination;
+// Move from start to destination in index
+struct move {
+	int start;
+	int destination;
 };
 
 
@@ -77,6 +79,9 @@ int Heuristic(char*);
 int getRowIndex(int);
 int getColumnIndex(int);
 string indexToBoard(int);
+bool winningBoard(char*);
+void getAllMoves(char*, vector<move>&, bool);
+
 
 int main() {
 
@@ -407,6 +412,70 @@ string indexToBoard(int index) {
 	return temp;
 }
 
+vector<move> getAllMoves(char *tempBoard, bool player){
+	char token;
+	vector<move> allMoves;
+	if (player) {
+		token = 'G';
+	}
+	else {
+		token = 'R';
+	}
+	if (!winningBoard(tempBoard)) {
+		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+			// Loops through array to check if the token is the current player
+			if (tempBoard[i] == token) {
+				// Checks all adjacents
+				move temp;
+				temp.start = i;
+				for (int j = 0; j < .size(); j++ ) { // Loops through all available adjacents
+					temp.destination = j;
+					allMoves.push_back(temp);
+				}
+			}
+		}
+	}
+	return allMoves;
+}
+
+// Implements minimax, and returns the best move the ai should take according.
+move getAiMove(int depth, char* board, bool playerMax) {
+	vector<move> allMoves = getAllMoves(board, playerMax);
+	if (playerMax) {
+		for (int i = 0; allMoves.size(); i++) {
+			ProcessMoveRequest(allMoves[i]);
+			char tempBoard[MAX_BOARD_SIZE] = 
+		}
+	}
+}
+
+int minSearch(int depth, char* board, bool player) {
+	if (depth == 0 || getAllMoves(board, player).empty()) {
+		return Heuristic(board);
+	}
+
+}
+
+int maxSearch(int depth, char* board, bool player) {
+	if (depth == 0 || getAllMoves(board, player).empty()) {
+		return Heuristic(board);
+	}
+}
+
+// Check if either player wins.
+bool winningBoard(char* board) {
+	int gcounter = 0;
+	int rcounter = 0;
+	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+		if (board[i] == 'G') {
+			gcounter++;
+		}
+		else if (board[i] == 'R') {
+			rcounter++;
+		}
+	}
+	return (gcounter == 0 || rcounter == 0);
+}
 
 // Method to process the attacking
 void attacking(int pos, int dest) {
@@ -513,3 +582,6 @@ int alphaBetaMin(int alpha, int beta, int depthLevel) {
 
 	return 0;
 }
+
+
+
