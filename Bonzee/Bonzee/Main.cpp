@@ -44,7 +44,7 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
-std::map<int, std::vector<int> > possibleMoves;
+std::map<int, std::vector<int> > adjacentCells;
 
 
 // Board setting to win in one move
@@ -81,6 +81,18 @@ int main() {
 		generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH);
 	}
 
+	// Print out map
+	for (int j = 0; j < MAX_BOARD_SIZE; j++) {
+
+		cout << "Map[" << j << "] = ( ";
+
+		for (int k = 0; k < adjacentCells[j].size(); k++) {
+			cout << adjacentCells[j].at(k) << " ";
+		}
+
+		cout << ") " << endl;
+	}
+
 	cout << Heuristic(board);
 
 	while (!isGameOver()) {
@@ -109,51 +121,65 @@ int main() {
 
 void generateMap(int index, int boardSize, int row_length) {
 
-	possibleMoves.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
+	adjacentCells.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
 
 	// Check Left Bound
 	if (index % row_length != 0) {
 
 		// Add Upper Left Diagonal Index
 		if (index > row_length && index % 2 == 0) {
-			possibleMoves[index].push_back(index - (row_length - 1));
+			adjacentCells[index].push_back(index - (row_length - 1));
 		}
 
-		// Add Upper Left Diagonal Index
+		// Add Lower Left Diagonal Index
 		if (index < boardSize - row_length && index % 2 == 0) {
-			possibleMoves[index].push_back(index + (row_length - 1));
+			adjacentCells[index].push_back(index + (row_length - 1));
 		}
 
 		// Add Left Index
 		// temp.push_back(index - 1);
-		possibleMoves[index].push_back(index - 1);
+		adjacentCells[index].push_back(index - 1);
 	}
 
 	// Check Right Bound
 	if (index % (row_length) != 8) {
 
 		// Add Upper Right Diagonal Index
-		if (index > row_length && index % 2 == 0) {
-			possibleMoves[index].push_back(index - (row_length + 1));
+		if (index > (row_length - 1) && index % 2 == 0) {
+			adjacentCells[index].push_back((index - row_length) + 1);
 		}
 
-		// Add Upper Right Diagonal Index
+		// Add Lower Right Diagonal Index
 		if (index < boardSize - row_length && index % 2 == 0) {
-			possibleMoves[index].push_back(index + (row_length + 1));
+			adjacentCells[index].push_back(index + (row_length + 1));
 		}
 
 		// Add Right Index
-		possibleMoves[index].push_back(index + 1);
+		adjacentCells[index].push_back(index + 1);
 	}
 
 	// Add Top Index
 	if (index > row_length)
-		possibleMoves[index].push_back(index - row_length);
+		adjacentCells[index].push_back(index - row_length);
 
 	// Add Bottom Index
 	if (index < boardSize - row_length)
-		possibleMoves[index].push_back(index + row_length);
+		adjacentCells[index].push_back(index + row_length);
 
+}
+
+
+// Check the possible moves at given index
+std::vector<int> checkPossibleMoves(int index, int updatedBoard[]) {
+
+	std::vector<int> moves;
+
+	for (int i = 0; i < adjacentCells[index].size(); i++) {
+		if (updatedBoard[adjacentCells[index].at(i)] == ' ')
+			moves.push_back(adjacentCells[index].at(i));
+	}
+
+	return moves;
 }
 
 
