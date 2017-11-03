@@ -75,7 +75,7 @@ bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
-void attacking(int, int);
+void attacking(int, int, char*);
 bool adjacent(int, int);
 void tokenCountUpdate();
 int Heuristic(char*);
@@ -279,7 +279,7 @@ void ProcessMoveRequest() {
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
 
 					// Execute Attack Algorithm
-					attacking(choIndex, destIndex);
+					attacking(choIndex, destIndex, board);
 
 					completedTurn = true;
 					cout << "  Red: " << redCounter << ", Green: " << greenCounter << ", HELLO:" <<  indexToBoard(choIndex) <<endl;
@@ -571,7 +571,7 @@ bool winningBoard(char* board) {
 }
 
 // Method to process the attacking
-void attacking(int pos, int dest) {
+void attacking(int pos, int dest, char* currentBoard) {
 
 	// Move attacking token forward/backward 
 	board[dest] = board[pos];
@@ -581,20 +581,20 @@ void attacking(int pos, int dest) {
 	int direction    = dest - pos;
 	int tempPosition = dest;
 	int target       = dest + direction;
-	char targetColor = board[target];
+	char targetColor = currentBoard[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (target < 0 || target > MAX_BOARD_SIZE || targetColor == ' ' || targetColor == board[pos] || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -(ROW_LENGTH + 1) || direction == (ROW_LENGTH - 1) )) || (dest % ROW_LENGTH == (ROW_LENGTH - 1) && (direction == 1 || direction == (ROW_LENGTH + 1) || direction == -(ROW_LENGTH - 1)))) {
+	if (target < 0 || target > MAX_BOARD_SIZE || targetColor == ' ' || targetColor == currentBoard[pos] || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -(ROW_LENGTH + 1) || direction == (ROW_LENGTH - 1) )) || (dest % ROW_LENGTH == (ROW_LENGTH - 1) && (direction == 1 || direction == (ROW_LENGTH + 1) || direction == -(ROW_LENGTH - 1)))) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
-		targetColor  = board[target];
+		targetColor  = currentBoard[target];
 	}
 	
 	// Begin attack loop
-	if (board[pos] != targetColor) {
-		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == board[target]) && adjacent(tempPosition, target) && board[target] != ' ') {
-			board[target] = ' ';
+	if (currentBoard[pos] != targetColor) {
+		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == currentBoard[target]) && adjacent(tempPosition, target) && currentBoard[target] != ' ') {
+			currentBoard[target] = ' ';
 			tempPosition = target;
 			target += direction;
 			tokenCountUpdate();
