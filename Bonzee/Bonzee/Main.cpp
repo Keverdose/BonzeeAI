@@ -74,6 +74,8 @@ int getRowIndex(int);
 int getColumnIndex(int);
 void generateMap(int, int, int);
 
+
+
 int main() {
 
 	// Generate the Map for all indices
@@ -81,17 +83,25 @@ int main() {
 		generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH);
 	}
 
-	// Print out map
-	for (int j = 0; j < MAX_BOARD_SIZE; j++) {
+	//// Print out map
+	//for (int j = 0; j < MAX_BOARD_SIZE; j++) {
 
-		cout << "Map[" << j << "] = ( ";
+	//	cout << "Map[" << j << "] = ( ";
 
-		for (int k = 0; k < adjacentCells[j].size(); k++) {
-			cout << adjacentCells[j].at(k) << " ";
-		}
+	//	for (int k = 0; k < adjacentCells[j].size(); k++) {
+	//		cout << adjacentCells[j].at(k) << " ";
+	//	}
 
-		cout << ") " << endl;
-	}
+	//	cout << ") " << endl;
+	//}
+
+
+	//std::vector<int> positions = checkPossibleMoves(23, board);
+
+	//for (int o = 0; o < positions.size(); o++) {
+	//	cout << "Possible Moves: " << positions.at(o) << endl;
+	//}
+
 
 	cout << Heuristic(board);
 
@@ -118,39 +128,39 @@ int main() {
 	cin.get();
 }
 
-
+// Generates the Map of all Adjacent Cells based on possible moves
 void generateMap(int index, int boardSize, int row_length) {
 
+	// Insert a new entry into the Map
 	adjacentCells.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
 
 	// Check Left Bound
 	if (index % row_length != 0) {
 
 		// Add Upper Left Diagonal Index
-		if (index > row_length && index % 2 == 0) {
-			adjacentCells[index].push_back(index - (row_length - 1));
+		if ((index > row_length) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index - (row_length + 1));
 		}
 
 		// Add Lower Left Diagonal Index
-		if (index < boardSize - row_length && index % 2 == 0) {
+		if ((index < (boardSize - row_length)) && (index % 2 == 0)) {
 			adjacentCells[index].push_back(index + (row_length - 1));
 		}
 
 		// Add Left Index
-		// temp.push_back(index - 1);
-		adjacentCells[index].push_back(index - 1);
+		 adjacentCells[index].push_back(index - 1);
 	}
 
 	// Check Right Bound
-	if (index % (row_length) != 8) {
+	if ((index % (row_length)) != (row_length - 1)) {
 
 		// Add Upper Right Diagonal Index
-		if (index > (row_length - 1) && index % 2 == 0) {
+		if ((index > (row_length - 1)) && (index % 2 == 0)) {
 			adjacentCells[index].push_back((index - row_length) + 1);
 		}
 
 		// Add Lower Right Diagonal Index
-		if (index < boardSize - row_length && index % 2 == 0) {
+		if ((index < boardSize - row_length) && (index % 2 == 0)) {
 			adjacentCells[index].push_back(index + (row_length + 1));
 		}
 
@@ -159,18 +169,18 @@ void generateMap(int index, int boardSize, int row_length) {
 	}
 
 	// Add Top Index
-	if (index > row_length)
+	if (index > (row_length - 1) )
 		adjacentCells[index].push_back(index - row_length);
 
 	// Add Bottom Index
-	if (index < boardSize - row_length)
+	if (index < (boardSize - row_length))
 		adjacentCells[index].push_back(index + row_length);
 
 }
 
 
 // Check the possible moves at given index
-std::vector<int> checkPossibleMoves(int index, int updatedBoard[]) {
+std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
 
 	std::vector<int> moves;
 
@@ -181,7 +191,6 @@ std::vector<int> checkPossibleMoves(int index, int updatedBoard[]) {
 
 	return moves;
 }
-
 
 // Function to check if game is over or not.
 bool isGameOver() {
