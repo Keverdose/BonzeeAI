@@ -264,7 +264,7 @@ void ProcessMoveRequest() {
 				destIndex = BoardToIndex(destination);
 
 				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
+				if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
 
 					// Execute Attack Algorithm
 					attacking(choIndex, destIndex, board);
@@ -289,78 +289,79 @@ void ProcessMoveRequest() {
 }
 
 
+
 // Function that returns boolean to check whether the selected token has an available move
-bool availableSpace(int currentPosition) {
-
-	// If the current position is out of bound
-	if (currentPosition < EMPTY_BOARD || currentPosition > (MAX_BOARD_SIZE - 1)) 
-		return false;
-
-		
-	// Checks downwards
-	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
-		if (board[currentPosition + ROW_LENGTH] == ' ') {
-			return true;
-		}
-	}
-		
-	// Checks upwards
-	if (currentPosition - ROW_LENGTH > -1) {
-		if (board[currentPosition - ROW_LENGTH] == ' ') {
-			return true;
-		}
-	}
-		
-	// Checks right (Makes sure the rightmost column can't go right)
-	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-		if (board[currentPosition + 1] == ' ') {
-			return true;
-		}
-	}
-		
-	// Checks left (Makes sure the leftmost column can't go left)
-	if ((currentPosition % ROW_LENGTH) != 0) {
-		if (board[currentPosition - 1] == ' ') {
-			return true;
-		}
-	}
-		
-
-	// IF CELL IS BLACK (DIAGONAL CHECKS)
-	if (currentPosition % 2 == 0) {
-
-		// Checks topleft
-		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
-			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') {
-				return true;
-			}
-		}
-			
-		// Checks topright
-		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') {
-				return true;
-			}
-		}
-			
-		// Checks bottomleft
-		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
-			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') {
-				return true;
-			}
-		}
-			
-		// Checks bottomright
-		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') {
-				return true;
-			}
-		}
-
-	}
-
-	return false;
-}
+//bool availableSpace(int currentPosition) {
+//
+//	// If the current position is out of bound
+//	if (currentPosition < EMPTY_BOARD || currentPosition > (MAX_BOARD_SIZE - 1)) 
+//		return false;
+//
+//		
+//	// Checks downwards
+//	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
+//		if (board[currentPosition + ROW_LENGTH] == ' ') {
+//			return true;
+//		}
+//	}
+//		
+//	// Checks upwards
+//	if (currentPosition - ROW_LENGTH > -1) {
+//		if (board[currentPosition - ROW_LENGTH] == ' ') {
+//			return true;
+//		}
+//	}
+//		
+//	// Checks right (Makes sure the rightmost column can't go right)
+//	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+//		if (board[currentPosition + 1] == ' ') {
+//			return true;
+//		}
+//	}
+//		
+//	// Checks left (Makes sure the leftmost column can't go left)
+//	if ((currentPosition % ROW_LENGTH) != 0) {
+//		if (board[currentPosition - 1] == ' ') {
+//			return true;
+//		}
+//	}
+//		
+//
+//	// IF CELL IS BLACK (DIAGONAL CHECKS)
+//	if (currentPosition % 2 == 0) {
+//
+//		// Checks topleft
+//		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
+//			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') {
+//				return true;
+//			}
+//		}
+//			
+//		// Checks topright
+//		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+//			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') {
+//				return true;
+//			}
+//		}
+//			
+//		// Checks bottomleft
+//		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
+//			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') {
+//				return true;
+//			}
+//		}
+//			
+//		// Checks bottomright
+//		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
+//			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') {
+//				return true;
+//			}
+//		}
+//
+//	}
+//
+//	return false;
+//}
 
 
 // Checks whether it is a valid destination 
@@ -377,49 +378,60 @@ bool destinationCheck(int position, int destination) {
 
 
 // Method to check adjacency of positions
+//bool adjacent(int position, int destination) {
+//
+//	// Have to make sure that the 1st column and last column cant go left or right
+//	if (position % 2 == 0) {
+//		if (position % ROW_LENGTH == 0)
+//			return(position + 1 == destination
+//				|| position + (ROW_LENGTH + 1) == destination
+//				|| position - ROW_LENGTH == destination
+//				|| position + ROW_LENGTH == destination
+//				|| position - (ROW_LENGTH - 1) == destination);
+//
+//		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
+//			return(position - 1 == destination
+//				|| position - (ROW_LENGTH + 1) == destination
+//				|| position - ROW_LENGTH == destination
+//				|| position + ROW_LENGTH == destination
+//				|| position + (ROW_LENGTH - 1) == destination);
+//
+//		return(position + 1 == destination
+//			|| position - 1 == destination
+//			|| position - (ROW_LENGTH + 1) == destination
+//			|| position + (ROW_LENGTH + 1) == destination
+//			|| position - ROW_LENGTH == destination
+//			|| position + ROW_LENGTH == destination
+//			|| position - (ROW_LENGTH - 1) == destination
+//			|| position + (ROW_LENGTH - 1) == destination);
+//	}
+//	else {
+//		if (position % ROW_LENGTH == 0)
+//			return(position + 1 == destination
+//				|| position - ROW_LENGTH == destination
+//				|| position + ROW_LENGTH == destination);
+//
+//		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
+//			return(position - 1 == destination
+//				|| position - ROW_LENGTH == destination
+//				|| position + ROW_LENGTH == destination);
+//
+//		return(position + 1 == destination
+//			|| position - 1 == destination
+//			|| position - ROW_LENGTH == destination
+//			|| position + ROW_LENGTH == destination);
+//	}
+//}
+
+// New Adjacent Function that looks up the map for adjacent cells
 bool adjacent(int position, int destination) {
 
-	// Have to make sure that the 1st column and last column cant go left or right
-	if (position % 2 == 0) {
-		if (position % ROW_LENGTH == 0)
-			return(position + 1 == destination
-				|| position + (ROW_LENGTH + 1) == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination
-				|| position - (ROW_LENGTH - 1) == destination);
-
-		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
-			return(position - 1 == destination
-				|| position - (ROW_LENGTH + 1) == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination
-				|| position + (ROW_LENGTH - 1) == destination);
-
-		return(position + 1 == destination
-			|| position - 1 == destination
-			|| position - (ROW_LENGTH + 1) == destination
-			|| position + (ROW_LENGTH + 1) == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination
-			|| position - (ROW_LENGTH - 1) == destination
-			|| position + (ROW_LENGTH - 1) == destination);
+	for (int i = 0; i < adjacentCells[position].size(); i++) {
+		if (adjacentCells[position].at(i) == destination)
+			return true;
 	}
-	else {
-		if (position % ROW_LENGTH == 0)
-			return(position + 1 == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination);
 
-		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
-			return(position - 1 == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination);
-
-		return(position + 1 == destination
-			|| position - 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination);
-	}
+	return false;
 }
 
 
