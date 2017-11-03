@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <map>
 #include <algorithm>
 
 // -- Namespaces
@@ -35,21 +37,23 @@ A move choice of B3 means 11 (B maps to [9, 17] so 9+3-1 = 11 (the cols go from 
 
 
 // -- char version of board
-//char board[MAX_BOARD_SIZE] = {
-//	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-//	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-//	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
-//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+char board[MAX_BOARD_SIZE] = {
+	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+	'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', 'R',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
+	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+
+std::map<int, std::vector<int> > possibleMoves;
 
 
 // Board setting to win in one move
-char board[MAX_BOARD_SIZE] = {
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
-	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
+//char board[MAX_BOARD_SIZE] = {
+//	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+//	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+//	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
+//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
+//	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 	
 // redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
 
@@ -70,6 +74,11 @@ int getRowIndex(int);
 int getColumnIndex(int);
 
 int main() {
+
+	// Generate the Map for all indices
+	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+		generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH);
+	}
 
 	cout << Heuristic(board);
 
@@ -94,6 +103,56 @@ int main() {
 	}
 
 	cin.get();
+}
+
+
+void generateMap(int index, int boardSize, int row_length) {
+
+	possibleMoves.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
+
+	// Check Left Bound
+	if (index % row_length != 0) {
+
+		// Add Upper Left Diagonal Index
+		if (index > row_length && index % 2 == 0) {
+			possibleMoves[index].push_back(index - (row_length - 1));
+		}
+
+		// Add Upper Left Diagonal Index
+		if (index < boardSize - row_length && index % 2 == 0) {
+			possibleMoves[index].push_back(index + (row_length - 1));
+		}
+
+		// Add Left Index
+		// temp.push_back(index - 1);
+		possibleMoves[index].push_back(index - 1);
+	}
+
+	// Check Right Bound
+	if (index % (row_length) != 8) {
+
+		// Add Upper Right Diagonal Index
+		if (index > row_length && index % 2 == 0) {
+			possibleMoves[index].push_back(index - (row_length + 1));
+		}
+
+		// Add Upper Right Diagonal Index
+		if (index < boardSize - row_length && index % 2 == 0) {
+			possibleMoves[index].push_back(index + (row_length + 1));
+		}
+
+		// Add Right Index
+		possibleMoves[index].push_back(index + 1);
+	}
+
+	// Add Top Index
+	if (index > row_length)
+		possibleMoves[index].push_back(index - row_length);
+
+	// Add Bottom Index
+	if (index < boardSize - row_length)
+		possibleMoves[index].push_back(index + row_length);
+
 }
 
 
