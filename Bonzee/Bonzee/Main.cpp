@@ -73,10 +73,12 @@ int Heuristic(char*);
 int getRowIndex(int);
 int getColumnIndex(int);
 void generateMap(int, int, int);
-
+char AIColorChoice();
 
 
 int main() {
+
+	char aiColor = AIColorChoice();
 
 	// Generate the Map for all indices
 	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
@@ -104,6 +106,8 @@ int main() {
 
 
 	cout << Heuristic(board);
+
+	// TODO: Use the char aiColor to process moves differently, i.e. validate moves based off whether player or AI is playing
 
 	while (!isGameOver()) {
 		
@@ -571,4 +575,30 @@ int getRowIndex(int index){
 // Takes in a board index and returns its column index # (i.e. 27 returns 1 because it's in the 1st column)
 int getColumnIndex(int index){
 	return (index % 9) + 1;
+}
+
+// Function to determine whether the AI will play the green tokens or the red tokens (as returned)
+char AIColorChoice() {
+	// For the do-while
+	bool complete = false;
+
+	do {
+		cout << "Which color should the computer play? (G: Green, R: Red)" << endl;
+		string answer = "";
+		getline(cin, answer);
+		transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
+
+		if (answer.length() > 1) {
+			cout << "ERROR: Invalid input. Please try again." << endl;
+		}
+		else {
+			if (answer.at(0) == 'R' || answer.at(0) == 'G') {
+				cout << answer.at(0) << endl;
+				return answer.at(0);
+			}
+			else {
+				cout << "ERROR: Invalid input. Please try again." << endl;
+			}
+		}
+	} while (!complete);
 }
