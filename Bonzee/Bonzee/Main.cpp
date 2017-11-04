@@ -22,6 +22,7 @@ static const int ASCII_LETTER_OFFSET = 48;
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
 static bool isPlayerOne = true;
+static char aiColor = 'G';
 
 /* BOARD LAYOUT:
 	1  2  3  4  5  6  7  8  9
@@ -78,7 +79,7 @@ char AIColorChoice();
 
 int main() {
 
-	char aiColor = AIColorChoice();
+	aiColor = AIColorChoice();
 
 	// Generate the Map for all indices
 	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
@@ -234,62 +235,72 @@ void ProcessMoveRequest() {
 	bool completedTurn = false;
 	string answer;
 
-	do {
+	if (isPlayerOne && aiColor == 'G') {
+		// Process AI move with respect to green tokens
+		return;
+	}
+	else if (!isPlayerOne && aiColor == 'R') {
+		// Process AI move with respect to red tokens
+		return;
+	}
+	else {
+		do {
 
-		if (isPlayerOne)
-			cout << "Player One's Turn (Green). \n  Please enter move: ";
-		else
-			cout << "Player Two's Turn (Red). \n  Please enter move: ";
-
-		getline(cin, answer);
-		transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
-
-		// Input Validation
-		if (answer.length() != 5)
-			cout << "Invalid String given, please try again." << endl;
-
-		else if (answer.at(2) != ' ')
-			cout << "Invalid String given, please try again." << endl;
-
-
-		// Process Input
-		else {
-			// Transforms the answer into two coordinates
-			int choIndex, destIndex;
-			string choice = { answer.at(0), answer.at(1) };
-			string destination = { answer.at(3), answer.at(4) };
-
-			cout << "\nBoard Update: " << endl;
-			cout << "  Position: " << choice << "; Destination: " << destination << endl;
-
-			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
-			if (IsValidChoice(choice) && IsValidChoice(destination)) {
-				choIndex = BoardToIndex(choice);
-				destIndex = BoardToIndex(destination);
-
-				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-				if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
-
-					// Execute Attack Algorithm
-					attacking(choIndex, destIndex, board);
-
-					// Move attacking token forward/backward 
-					board[destIndex] = board[choIndex];
-					board[choIndex] = ' ';
-					completedTurn = true;
-					cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
-				}
-
-				else
-					cout << "This is an invalid move. Please try again." << endl;
-			}
+			if (isPlayerOne)
+				cout << "Player One's Turn (Green). \n  Please enter move: ";
 			else
-				cout << "Invalid positions, please try again." << endl;
-		}
+				cout << "Player Two's Turn (Red). \n  Please enter move: ";
 
-		// PrintBoard();
+			getline(cin, answer);
+			transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
 
-	} while (!completedTurn);
+																				// Input Validation
+			if (answer.length() != 5)
+				cout << "Invalid String given, please try again." << endl;
+
+			else if (answer.at(2) != ' ')
+				cout << "Invalid String given, please try again." << endl;
+
+
+			// Process Input
+			else {
+				// Transforms the answer into two coordinates
+				int choIndex, destIndex;
+				string choice = { answer.at(0), answer.at(1) };
+				string destination = { answer.at(3), answer.at(4) };
+
+				cout << "\nBoard Update: " << endl;
+				cout << "  Position: " << choice << "; Destination: " << destination << endl;
+
+				// Checks if the two coordinates are within the array, if so then continue. else, prompt again
+				if (IsValidChoice(choice) && IsValidChoice(destination)) {
+					choIndex = BoardToIndex(choice);
+					destIndex = BoardToIndex(destination);
+
+					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
+					if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
+
+						// Execute Attack Algorithm
+						attacking(choIndex, destIndex, board);
+
+						// Move attacking token forward/backward 
+						board[destIndex] = board[choIndex];
+						board[choIndex] = ' ';
+						completedTurn = true;
+						cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
+					}
+
+					else
+						cout << "This is an invalid move. Please try again." << endl;
+				}
+				else
+					cout << "Invalid positions, please try again." << endl;
+			}
+
+			// PrintBoard();
+
+		} while (!completedTurn);
+	}
 }
 
 
