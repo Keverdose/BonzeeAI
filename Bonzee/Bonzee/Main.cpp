@@ -27,7 +27,7 @@ static bool isPlayerOne = true;
 static std::vector<int> heuristicValue;
 
 // Move from start to destination in index
-struct move {
+struct Move {
 	int start;
 	int destination;
 };
@@ -75,7 +75,7 @@ bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
-void attacking(move, char*);
+void attacking(Move, char*);
 bool adjacent(int, int);
 void tokenCountUpdate();
 int Heuristic(char*);
@@ -83,9 +83,11 @@ int getRowIndex(int);
 int getColumnIndex(int);
 string indexToBoard(int);
 bool winningBoard(char*);
-void getAllMoves(char*, vector<move>&, bool);
+void getAllMoves(char*, vector<Move>&, bool);
 void generateMap(int, int, int);
 
+int maxSearch(int, char*, bool, int);
+int minSearch(int, char*, bool, int);
 
 
 int main() {
@@ -278,7 +280,7 @@ void ProcessMoveRequest() {
 				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
 				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
 
-					move userMove;
+					Move userMove;
 					userMove.start = choIndex;
 					userMove.destination = destIndex;
 					// Execute Attack Algorithm
@@ -510,9 +512,9 @@ string indexToBoard(int index) {
 
 
 // Loops through the array to add all possible move given the player's token.
-vector<move> getAllMoves(char *tempBoard, bool player){
+vector<Move> getAllMoves(char *tempBoard, bool player){
 	char token;
-	vector<move> allMoves;
+	vector<Move> allMoves;
 	if (player) {
 		token = 'G';
 	}
@@ -524,7 +526,7 @@ vector<move> getAllMoves(char *tempBoard, bool player){
 			// Loops through array to check if the token is the current player
 			if (tempBoard[i] == token) {
 				// Checks all adjacents
-				move temp;
+				Move temp;
 				temp.start = i;
 				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard);
 				for (int j = 0; j < possibleMovesDestination.size(); j++ ) { // Loops through all available adjacents
@@ -538,10 +540,10 @@ vector<move> getAllMoves(char *tempBoard, bool player){
 }
 
 // Implements minimax, and returns the best move the ai should take according. 
-move getAiMove(int depth, char* board, bool playerMax) {
-	vector<move> allMoves = getAllMoves(board, playerMax);
+Move getAiMove(int depth, char* board, bool playerMax) {
+	vector<Move> allMoves = getAllMoves(board, playerMax);
 	char tempBoard[MAX_BOARD_SIZE];
-	move aiMove;
+	Move aiMove;
 	for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 		tempBoard[k] = board[k];
 	}
@@ -549,11 +551,13 @@ move getAiMove(int depth, char* board, bool playerMax) {
 		int highestValue = - 9999999;
 		for (int i = 0; i < allMoves.size(); i++) {
 			attacking(allMoves[i], tempBoard);
-			int value = maxSearch(depth - 1, tempBoard, !playerMax);
-			if (value > highestValue) {
+			int value = maxSearch(depth - 1, tempBoard, !playerMax, highestValue);	// Will return the best heuristic value through recursion
+			/*if (value > highestValue) {
 				highestValue = value;
 				aiMove = allMoves[i];
-			}
+			}*/
+
+			// ==== PROCEED WITH AI MOVE SELCTION ==== 
 
 		}
 	}
@@ -561,49 +565,93 @@ move getAiMove(int depth, char* board, bool playerMax) {
 		int lowestValue = 9999999;
 		for (int i = 0; i < allMoves.size(); i++) {
 			attacking(allMoves[i], tempBoard);
-			int value = minSearch(depth - 1, tempBoard, !playerMax);
-			if (value < lowestValue) {
+			int value = minSearch(depth - 1, tempBoard, !playerMax, lowestValue);	// Will return the best heuristic value through recursion
+			/*if (value < lowestValue) {
 				lowestValue = value;
 				aiMove = allMoves[i];
-			}
+			}*/
+
+			// ==== PROCEED WITH AI MOVE SELCTION ==== 
 		}
 	}
 	return aiMove; //Returns the ai's move.
 }
 
 // Minimize the win condition (Recursion)
-int minSearch(int depth, char* board, bool player) {
+int minSearch(int depth, char* board, bool player, int previousValue) {
+
+	// Return the best heuristic value once we reach a leaf or winning node
 	if (depth == 0 || getAllMoves(board, player).empty()) {
-		return Heuristic(board);
+		int depthValue = Heuristic(board);
+
+		if (depthValue < previousValue)
+			return depthValue;
+
+		return previousValue;
 	}
+
 	else {
-		vector<move> allMoves = getAllMoves(board, player);
+		vector<Move> allMoves = getAllMoves(board, player);
+
+		// Create the board and copy all values from previous board
 		char tempBoard[MAX_BOARD_SIZE];
 		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 			tempBoard[k] = board[k];
 		}
+
+		// -- Perform every single possible attack on current board configuration
 		for (int i = 0; i < allMoves.size(); i++) {
 			attacking(allMoves[i], tempBoard);
-			return maxSearch(depth - 1, tempBoard, !player); // not sure if its going to work
+			
+			// Calculates the new heuristic of board after the attack has been made
+			int tempBoardHeuristic = Heuristic(board);
+
+			// -- Pass on the lowest heuristic value into the recursive function
+			if (tempBoardHeuristic < previousValue) {
+				return maxSearch(depth - 1, tempBoard, !player, tempBoardHeuristic);
+			}
+
+			return maxSearch(depth - 1, tempBoard, !player, previousValue);
 		}
 	}
 
 }
 
 // Maximize the win condition (Recursion)
-int maxSearch(int depth, char* board, bool player) {
+int maxSearch(int depth, char* board, bool player, int previousValue) {
+
+	// Return the best heuristic value once we reach a leaf or winning node
 	if (depth == 0 || getAllMoves(board, player).empty()) {
-		return Heuristic(board);
+		int depthValue = Heuristic(board);
+
+		if (depthValue > previousValue)
+			return depthValue;
+
+		return previousValue;
 	}
+
 	else {
-		vector<move> allMoves = getAllMoves(board, player);
+		vector<Move> allMoves = getAllMoves(board, player);
+
+		// Create the board and copy all values from previous board
 		char tempBoard[MAX_BOARD_SIZE];
 		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 			tempBoard[k] = board[k];
 		}
+
+		// -- Perform every single possible attack on current board configuration
 		for (int i = 0; i < allMoves.size(); i++) {
 			attacking(allMoves[i], tempBoard);
-			return minSearch(depth - 1, tempBoard, !player);   // not sure if its going to work
+
+			// Calculates the new heuristic of board after the attack has been made
+			int tempBoardHeuristic = Heuristic(board);
+			
+			// -- Pass on the lowest heuristic value into the recursive function
+			if (tempBoardHeuristic > previousValue) {
+				return minSearch(depth - 1, tempBoard, !player, tempBoardHeuristic);
+			}
+
+			return minSearch(depth - 1, tempBoard, !player, previousValue);
 		}
 	}
 }
@@ -624,7 +672,7 @@ bool winningBoard(char* board) {
 }
 
 // Method to process the attacking
-void attacking(move inputMove, char* currentBoard) {
+void attacking(Move inputMove, char* currentBoard) {
 
 	// Get the move indices
 	int dest = inputMove.destination;
