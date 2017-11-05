@@ -20,7 +20,7 @@ static const int ROW_LENGTH     = 9;
 static const int COLUMN_LENGTH  = 5;
 static const int MAX_PIECES_NUM = 22;
 static const int ASCII_LETTER_OFFSET = 48;
-static const int depth = 3; // Level of recursion
+static const int depth = 4; // Level of recursion
 
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
@@ -604,6 +604,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 			attacking(allMoves[i], tempBoard);
 			int value = maxSearch(depth - 1, tempBoard, !playerMax);
 			if (value > highestValue) {
+				cout << "Move updated because last move's heuristic: " << highestValue << ", and current new move's heuristic: " << value << endl;
 				highestValue = value;
 				aiMove = allMoves[i];
 			}
@@ -619,6 +620,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 			attacking(allMoves[i], tempBoard);
 			int value = minSearch(depth - 1, tempBoard, !playerMax);
 			if (value < lowestValue) {
+				cout << "Move updated because last move's heuristic: " << lowestValue << ", and current new move's heuristic: " << value << endl;
 				lowestValue = value;
 				aiMove = allMoves[i];
 			}
