@@ -110,25 +110,6 @@ int main() {
 		generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH);
 	}
 
-	//// Print out map
-	//for (int j = 0; j < MAX_BOARD_SIZE; j++) {
-
-	//	cout << "Map[" << j << "] = ( ";
-
-	//	for (int k = 0; k < adjacentCells[j].size(); k++) {
-	//		cout << adjacentCells[j].at(k) << " ";
-	//	}
-
-	//	cout << ") " << endl;
-	//}
-
-
-	//std::vector<int> positions = checkPossibleMoves(23, board);
-
-	//for (int o = 0; o < positions.size(); o++) {
-	//	cout << "Possible Moves: " << positions.at(o) << endl;
-	//}
-
 	singleOrMultiplayer();
 	while (!winningBoard(board)) {
 		
@@ -297,7 +278,7 @@ void ProcessMoveRequest() {
 
 	do {
 		// Check if current turn is ai's turn, and it's in singleplayer mode
-		if (isPlayerOne == (singlePlayer && aiTurn) ) {
+		if (isPlayerOne == aiTurn && singlePlayer) {
 
 			// Get the best move from the ai (Via recursion)
 			Move aiMove = getAiMove(depth, board, aiTurn);
@@ -322,9 +303,9 @@ void ProcessMoveRequest() {
 			if (answer.length() != 5)
 				cout << "Invalid String given, please try again." << endl;
 
+
 			else if (answer.at(2) != ' ')
 				cout << "Invalid String given, please try again." << endl;
-
 
 			// Process Input
 			else {
@@ -340,6 +321,7 @@ void ProcessMoveRequest() {
 				if (IsValidChoice(choice) && IsValidChoice(destination)) {
 					choIndex = BoardToIndex(choice);
 					destIndex = BoardToIndex(destination);
+
 
 					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
 					if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
@@ -361,83 +343,10 @@ void ProcessMoveRequest() {
 				else
 					cout << "Invalid positions, please try again." << endl;
 			}
+
 		}
 	} while (!completedTurn);
 }
-
-
-//// Function that returns boolean to check whether the selected token has an available move
-//bool availableSpace(int currentPosition) {
-//
-//	// If the current position is out of bound
-//	if (currentPosition < EMPTY_BOARD || currentPosition > (MAX_BOARD_SIZE - 1)) 
-//		return false;
-//
-//		
-//	// Checks downwards
-//	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
-//		if (board[currentPosition + ROW_LENGTH] == ' ') {
-//			return true;
-//		}
-//	}
-//		
-//	// Checks upwards
-//	if (currentPosition - ROW_LENGTH > -1) {
-//		if (board[currentPosition - ROW_LENGTH] == ' ') {
-//			return true;
-//		}
-//	}
-//		
-//	// Checks right (Makes sure the rightmost column can't go right)
-//	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-//		if (board[currentPosition + 1] == ' ') {
-//			return true;
-//		}
-//	}
-//		
-//	// Checks left (Makes sure the leftmost column can't go left)
-//	if ((currentPosition % ROW_LENGTH) != 0) {
-//		if (board[currentPosition - 1] == ' ') {
-//			return true;
-//		}
-//	}
-//		
-//
-//	// IF CELL IS BLACK (DIAGONAL CHECKS)
-//	if (currentPosition % 2 == 0) {
-//
-//		// Checks topleft
-//		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
-//			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') {
-//				return true;
-//			}
-//		}
-//			
-//		// Checks topright
-//		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-//			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') {
-//				return true;
-//			}
-//		}
-//			
-//		// Checks bottomleft
-//		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
-//			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') {
-//				return true;
-//			}
-//		}
-//			
-//		// Checks bottomright
-//		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-//			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') {
-//				return true;
-//			}
-//		}
-//
-//	}
-//
-//	return false;
-//}
 
 
 // Checks whether it is a valid destination 
@@ -453,50 +362,15 @@ bool destinationCheck(int position, int destination) {
 }
 
 
-// Method to check adjacency of positions
+// New Adjacent Function that looks up the map for adjacent cells
 bool adjacent(int position, int destination) {
 
-	// Have to make sure that the 1st column and last column cant go left or right
-	if (position % 2 == 0) {
-		if (position % ROW_LENGTH == 0)
-			return(position + 1 == destination
-				|| position + (ROW_LENGTH + 1) == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination
-				|| position - (ROW_LENGTH - 1) == destination);
-
-		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
-			return(position - 1 == destination
-				|| position - (ROW_LENGTH + 1) == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination
-				|| position + (ROW_LENGTH - 1) == destination);
-
-		return(position + 1 == destination
-			|| position - 1 == destination
-			|| position - (ROW_LENGTH + 1) == destination
-			|| position + (ROW_LENGTH + 1) == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination
-			|| position - (ROW_LENGTH - 1) == destination
-			|| position + (ROW_LENGTH - 1) == destination);
+	for (int i = 0; i < adjacentCells[position].size(); i++) {
+		if (adjacentCells[position].at(i) == destination)
+			return true;
 	}
-	else {
-		if (position % ROW_LENGTH == 0)
-			return(position + 1 == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination);
 
-		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
-			return(position - 1 == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination);
-
-		return(position + 1 == destination
-			|| position - 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination);
-	}
+	return false;
 }
 
 
