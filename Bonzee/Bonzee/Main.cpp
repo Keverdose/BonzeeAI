@@ -24,10 +24,12 @@ static const int ASCII_LETTER_OFFSET = 48;
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
 static bool isPlayerOne = true;
+static bool singlePlayer = true;
+static bool aiTurn;
 static std::vector<int> heuristicValue;
 
 // Move from start to destination in index
-struct move {
+struct Move {
 	int start;
 	int destination;
 };
@@ -54,6 +56,13 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
+//char board[MAX_BOARD_SIZE] = {
+//	'R', 'R', 'R', 'R', ' ', 'R', ' ', 'R', ' ',
+//	'R', 'R', 'R', ' ', 'R', 'R', 'R', 'R', ' ',
+//	' ', ' ', ' ', ' ', 'R', ' ', 'G', ' ', 'G',
+//	'G', 'G', 'G', ' ', 'G', 'G', 'G', ' ', ' ',
+//	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', ' ' };
+
 std::map<int, std::vector<int> > adjacentCells;
 
 // Board setting to win in one move
@@ -69,13 +78,12 @@ std::map<int, std::vector<int> > adjacentCells;
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
-bool isGameOver();
 bool availableSpace(int);
 bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
-void attacking(move, char*);
+void attacking(Move, char*);
 bool adjacent(int, int);
 void tokenCountUpdate();
 int Heuristic(char*);
@@ -83,9 +91,12 @@ int getRowIndex(int);
 int getColumnIndex(int);
 string indexToBoard(int);
 bool winningBoard(char*);
-void getAllMoves(char*, vector<move>&, bool);
+vector<Move> getAllMoves(char *tempBoard, bool player);
+int minSearch(int, char*, bool);
+int maxSearch(int, char*, bool);
+Move getAiMove(int, char*, bool);
 void generateMap(int, int, int);
-
+void singleOrMultiplayer();
 
 
 int main() {
@@ -114,28 +125,18 @@ int main() {
 	//	cout << "Possible Moves: " << positions.at(o) << endl;
 	//}
 
-
-	cout << Heuristic(board);
-
-	while (!isGameOver()) {
+	singleOrMultiplayer();
+	while (!winningBoard(board)) {
 		
 		PrintBoard();
 		ProcessMoveRequest();
-		// cin.get();
 		isPlayerOne = !isPlayerOne;
+		// cin.get();
 		cout << Heuristic(board);
 	}
 
 	// Post Game Display
-	if (greenCounter <= 0) {
-		PrintBoard();
-		cout << "Game Over! Red Wins!";
-	}
-
-	else if (redCounter <= 0) {
-		PrintBoard();
-		cout << "Game Over! Green Wins!";
-	}
+	cout << "Game is over!" << endl;
 
 	cin.get();
 }
@@ -190,6 +191,49 @@ void generateMap(int index, int boardSize, int row_length) {
 
 }
 
+// Method to decide whether it's multiplayer or single player
+void singleOrMultiplayer() {
+	bool modeChosen = false;
+	do {
+		cout << "Would you like to play singleplayer or multiplayer (s/m): ";
+		string answer = "";
+		getline(cin, answer);
+		transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
+		if (answer.length() > 1) {
+			cout << "Invalid choice, please try again: ";
+		}
+		else {
+			// If user chooses singleplayer mode, make him choose the AI's Token.
+			if (answer.at(0) == 'S') {
+				bool aiTokenChosen = false;
+				do {
+					cout << "Singleplayer mode chosen. You will play against a minimax A.I.; \nWhich token will the A.I. play? (R/G): ";
+					string aiChoice = "";
+					getline(cin, aiChoice);
+					transform(aiChoice.begin(), aiChoice.end(), aiChoice.begin(), ::toupper);
+					if (aiChoice.length() > 1 || (aiChoice.at(0) != 'R' && aiChoice.at(0) != 'G')) {
+						cout << "Invalid token, please try again: ";
+					}
+					else {
+						if (aiChoice.at(0) == 'R') {
+							aiTurn = false;
+						}
+						else {
+							aiTurn = true;
+						}
+						aiTokenChosen = true;
+					}
+				} while (!aiTokenChosen);
+			}
+			// If user chooses multiplayer mode, exit normally
+			if (answer.at(0) == 'M') {
+				cout << "Multiplayer mode chosen." << endl;
+				singlePlayer = false;
+			}
+			modeChosen = true;
+		}
+	} while (!modeChosen);
+}
 
 // Check the possible moves at given index
 std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
@@ -202,11 +246,6 @@ std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
 	}
 
 	return moves;
-}
-
-// Function to check if game is over or not.
-bool isGameOver() {
-	return (greenCounter <= EMPTY_BOARD || redCounter <= EMPTY_BOARD);
 }
 
 
@@ -243,56 +282,66 @@ void ProcessMoveRequest() {
 	string answer;
 
 	do {
-
-		if (isPlayerOne)
-			cout << "Player One's Turn (Green). \n  Please enter move: ";
-		else
-			cout << "Player Two's Turn (Red). \n  Please enter move: ";
-
-		getline(cin, answer);
-		transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
-
-		// Input Validation
-		if (answer.length() != 5)
-			cout << "Invalid String given, please try again." << endl;
-
-		else if (answer.at(2) != ' ')
-			cout << "Invalid String given, please try again." << endl;
-
-
-		// Process Input
+		// Check if current turn is ai's turn, and it's in singleplayer mode
+		if (isPlayerOne == aiTurn && singlePlayer) {
+			//Get the best move from the ai
+			Move aiMove = getAiMove(3, board, aiTurn);
+			cout << "The ai chooses: " << indexToBoard(aiMove.start) << " " << indexToBoard(aiMove.destination) << endl;
+			attacking(aiMove, board);
+			completedTurn = true;
+		}
+		// else let the player play
 		else {
-			// Transforms the answer into two coordinates
-			int choIndex, destIndex;
-			string choice = { answer.at(0), answer.at(1) };
-			string destination = { answer.at(3), answer.at(4) };
-
-			cout << "\nBoard Update: " << endl;
-			cout << "  Position: " << choice << "; Destination: " << destination << endl;
-
-			// Checks if the two coordinates are within the array, if so then continue. else, prompt again
-			if (IsValidChoice(choice) && IsValidChoice(destination)) {
-				choIndex = BoardToIndex(choice);
-				destIndex = BoardToIndex(destination);
-
-				// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-				if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
-
-					move userMove;
-					userMove.start = choIndex;
-					userMove.destination = destIndex;
-					// Execute Attack Algorithm
-					attacking(userMove, board);
-
-					completedTurn = true;
-					cout << "  Red: " << redCounter << ", Green: " << greenCounter << ", HELLO:" <<  indexToBoard(choIndex) <<endl;
-				}
-
-				else
-					cout << "This is an invalid move. Please try again." << endl;
-			}
+			if (isPlayerOne)
+				cout << "Player One's Turn (Green). \n  Please enter move: ";
 			else
-				cout << "Invalid positions, please try again." << endl;
+				cout << "Player Two's Turn (Red). \n  Please enter move: ";
+
+			getline(cin, answer);
+			transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
+
+			// Input Validation
+			if (answer.length() != 5)
+				cout << "Invalid String given, please try again." << endl;
+
+			else if (answer.at(2) != ' ')
+				cout << "Invalid String given, please try again." << endl;
+
+
+			// Process Input
+			else {
+				// Transforms the answer into two coordinates
+				int choIndex, destIndex;
+				string choice = { answer.at(0), answer.at(1) };
+				string destination = { answer.at(3), answer.at(4) };
+
+				cout << "\nBoard Update: " << endl;
+				cout << "  Position: " << choice << "; Destination: " << destination << endl;
+
+				// Checks if the two coordinates are within the array, if so then continue. else, prompt again
+				if (IsValidChoice(choice) && IsValidChoice(destination)) {
+					choIndex = BoardToIndex(choice);
+					destIndex = BoardToIndex(destination);
+
+					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
+					if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
+
+						Move userMove;
+						userMove.start = choIndex;
+						userMove.destination = destIndex;
+						// Execute Attack Algorithm
+						attacking(userMove, board);
+
+						completedTurn = true;
+						cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
+					}
+
+					else
+						cout << "This is an invalid move. Please try again." << endl;
+				}
+				else
+					cout << "Invalid positions, please try again." << endl;
+			}
 		}
 
 		// PrintBoard();
@@ -509,10 +558,10 @@ string indexToBoard(int index) {
 }
 
 
-// Loops through the array to add all possible move given the player's token.
-vector<move> getAllMoves(char *tempBoard, bool player){
+// Loops through the array to add all possible move given the player's token into a vector.
+vector<Move> getAllMoves(char *tempBoard, bool player){
 	char token;
-	vector<move> allMoves;
+	vector<Move> allMoves;
 	if (player) {
 		token = 'G';
 	}
@@ -524,7 +573,7 @@ vector<move> getAllMoves(char *tempBoard, bool player){
 			// Loops through array to check if the token is the current player
 			if (tempBoard[i] == token) {
 				// Checks all adjacents
-				move temp;
+				Move temp;
 				temp.start = i;
 				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard);
 				for (int j = 0; j < possibleMovesDestination.size(); j++ ) { // Loops through all available adjacents
@@ -538,10 +587,10 @@ vector<move> getAllMoves(char *tempBoard, bool player){
 }
 
 // Implements minimax, and returns the best move the ai should take according. 
-move getAiMove(int depth, char* board, bool playerMax) {
-	vector<move> allMoves = getAllMoves(board, playerMax);
+Move getAiMove(int depth, char* board, bool playerMax) {
+	vector<Move> allMoves = getAllMoves(board, playerMax);
 	char tempBoard[MAX_BOARD_SIZE];
-	move aiMove;
+	Move aiMove;
 	for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 		tempBoard[k] = board[k];
 	}
@@ -577,15 +626,21 @@ int minSearch(int depth, char* board, bool player) {
 		return Heuristic(board);
 	}
 	else {
-		vector<move> allMoves = getAllMoves(board, player);
+		vector<Move> allMoves = getAllMoves(board, player);
 		char tempBoard[MAX_BOARD_SIZE];
+		int minValue = 999999999;
 		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 			tempBoard[k] = board[k];
 		}
 		for (int i = 0; i < allMoves.size(); i++) {
+			int comparedValue;
 			attacking(allMoves[i], tempBoard);
-			return maxSearch(depth - 1, tempBoard, !player); // not sure if its going to work
+			comparedValue = maxSearch(depth - 1, tempBoard, !player); 
+			if (comparedValue < minValue) {
+				minValue = comparedValue;
+			}
 		}
+		return minValue;
 	}
 
 }
@@ -596,15 +651,21 @@ int maxSearch(int depth, char* board, bool player) {
 		return Heuristic(board);
 	}
 	else {
-		vector<move> allMoves = getAllMoves(board, player);
+		vector<Move> allMoves = getAllMoves(board, player);
 		char tempBoard[MAX_BOARD_SIZE];
+		int maxValue = -9999999;
 		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 			tempBoard[k] = board[k];
 		}
 		for (int i = 0; i < allMoves.size(); i++) {
 			attacking(allMoves[i], tempBoard);
-			return minSearch(depth - 1, tempBoard, !player);   // not sure if its going to work
+			int comparedValue;
+			comparedValue = minSearch(depth - 1, tempBoard, !player);
+			if (comparedValue > maxValue) {
+				maxValue = comparedValue;
+			}
 		}
+		return maxValue;
 	}
 }
 
@@ -624,13 +685,14 @@ bool winningBoard(char* board) {
 }
 
 // Method to process the attacking
-void attacking(move inputMove, char* currentBoard) {
+void attacking(Move inputMove, char* currentBoard) {
 
 	// Get the move indices
 	int dest = inputMove.destination;
 	int pos = inputMove.start;
 
 	// Move attacking token forward/backward 
+	char playerToken = currentBoard[pos];
 	currentBoard[dest] = currentBoard[pos];
 	currentBoard[pos] = ' ';
 
@@ -641,7 +703,7 @@ void attacking(move inputMove, char* currentBoard) {
 	char targetColor = currentBoard[target];
 
 	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (target < 0 || target > MAX_BOARD_SIZE || targetColor == ' ' || targetColor == currentBoard[pos] || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -(ROW_LENGTH + 1) || direction == (ROW_LENGTH - 1) )) || (dest % ROW_LENGTH == (ROW_LENGTH - 1) && (direction == 1 || direction == (ROW_LENGTH + 1) || direction == -(ROW_LENGTH - 1)))) {
+	if (target < 0 || target > MAX_BOARD_SIZE || targetColor == ' ' || targetColor == playerToken || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -(ROW_LENGTH + 1) || direction == (ROW_LENGTH - 1) )) || (dest % ROW_LENGTH == (ROW_LENGTH - 1) && (direction == 1 || direction == (ROW_LENGTH + 1) || direction == -(ROW_LENGTH - 1)))) {
 		direction *= -1;
 		tempPosition = pos;
 		target       = pos + direction;
@@ -650,11 +712,11 @@ void attacking(move inputMove, char* currentBoard) {
 	
 	// Begin attack loop
 	if (currentBoard[pos] != targetColor) {
-		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == currentBoard[target]) && adjacent(tempPosition, target) && currentBoard[target] != ' ') {
+		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == currentBoard[target]) && adjacent(tempPosition, target) && currentBoard[target] != ' ' && currentBoard[target] != playerToken) {
 			currentBoard[target] = ' ';
 			tempPosition = target;
 			target += direction;
-			tokenCountUpdate();
+			//tokenCountUpdate();
 		}
 	}
 }
@@ -715,16 +777,4 @@ int getRowIndex(int index){
 int getColumnIndex(int index){
 	return (index % 9) + 1;
 }
-
-int alphaBetaMax(int alpha, int beta, int depthLevel) {
-
-	return 0;
-}
-
-int alphaBetaMin(int alpha, int beta, int depthLevel) {
-
-	return 0;
-}
-
-
 
