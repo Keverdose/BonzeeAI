@@ -137,6 +137,7 @@ int main() {
 	}
 
 	// Post Game Display
+	PrintBoard();
 	cout << "Game is over!" << endl;
 
 	cin.get();
