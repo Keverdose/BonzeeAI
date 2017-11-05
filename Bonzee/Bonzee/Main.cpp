@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <vector>
 
+#include <ctime>
+
 // -- Namespaces
 using std::cout;
 using std::endl;
@@ -117,7 +119,7 @@ int main() {
 		ProcessMoveRequest();
 		isPlayerOne = !isPlayerOne;
 		// cin.get();
-		cout << Heuristic(board);
+		// cout << "Current Board Heuristic: " << Heuristic(board) << endl;
 	}
 
 	// Post Game Display
@@ -209,7 +211,7 @@ void singleOrMultiplayer() {
 				
 				do {
 					// Ask and process input
-					cout << "Singleplayer mode chosen. You will play against a minimax A.I.; \nWhich token will the A.I. play? (R/G): ";
+					cout << "> Singleplayer mode chosen. \n> You will play against a minimax A.I. \n\nWhich token will the A.I. play? (R/G): ";
 					string aiChoice = "";
 					getline(cin, aiChoice);
 					transform(aiChoice.begin(), aiChoice.end(), aiChoice.begin(), ::toupper);
@@ -266,7 +268,7 @@ void PrintBoard() {
 	}
 
 	cout << "\n\n  Black Cells Denoted By: [ ] - White Cells Denoted By: ( )";
-	cout << "\n\n ============================================================\n" << endl;
+	cout << "\n ============================================================\n" << endl;
 
 }
 
@@ -280,12 +282,21 @@ void ProcessMoveRequest() {
 		// Check if current turn is ai's turn, and it's in singleplayer mode
 		if (isPlayerOne == aiTurn && singlePlayer) {
 
+			// Start Timer before AI checks for best move
+			clock_t start = clock();
+
 			// Get the best move from the ai (Via recursion)
 			Move aiMove = getAiMove(depth, board, aiTurn);
 
 			// Display and Input the AI move
 			cout << "The ai chooses: " << indexToBoard(aiMove.start) << " " << indexToBoard(aiMove.destination) << endl;
 			attacking(aiMove, board);
+
+			// End Timer after AI inputted best move
+			clock_t end = clock();
+			double elapsedTime = double(end - start) / CLOCKS_PER_SEC;
+			cout << "Elapsed time: " << elapsedTime << " seconds " << endl;
+
 			completedTurn = true;
 		}
 
@@ -314,7 +325,7 @@ void ProcessMoveRequest() {
 				string choice = { answer.at(0), answer.at(1) };
 				string destination = { answer.at(3), answer.at(4) };
 
-				cout << "\nBoard Update: " << endl;
+				cout << "\nPlayer Input: " << endl;
 				cout << "  Position: " << choice << "; Destination: " << destination << endl;
 
 				// Checks if the two coordinates are within the array, if so then continue. else, prompt again
@@ -334,7 +345,7 @@ void ProcessMoveRequest() {
 						attacking(userMove, board);
 
 						completedTurn = true;
-						cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
+						// cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
 					}
 
 					else
