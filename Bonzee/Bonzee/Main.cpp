@@ -200,7 +200,7 @@ void singleOrMultiplayer() {
 		string answer = "";
 		getline(cin, answer);
 		transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
-		if (answer.length() > 1) {
+		if (answer.length() != 1 ) {
 			cout << "Invalid choice, please try again: ";
 		}
 		else {
@@ -212,7 +212,7 @@ void singleOrMultiplayer() {
 					string aiChoice = "";
 					getline(cin, aiChoice);
 					transform(aiChoice.begin(), aiChoice.end(), aiChoice.begin(), ::toupper);
-					if (aiChoice.length() > 1 || (aiChoice.at(0) != 'R' && aiChoice.at(0) != 'G')) {
+					if (aiChoice.length() != 1 || (aiChoice.at(0) != 'R' && aiChoice.at(0) != 'G')) {
 						cout << "Invalid token, please try again: ";
 					}
 					else {
