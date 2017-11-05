@@ -15,7 +15,9 @@ using std::string;
 using std::transform;
 using std::vector;
 
-// -- Variable definitions
+// =========== Variable definitions =========== 
+
+// Constants
 static const int MAX_BOARD_SIZE = 45;
 static const int EMPTY_BOARD    = 0;
 static const int ROW_LENGTH     = 9;
@@ -25,13 +27,19 @@ static const int ASCII_LETTER_OFFSET = 48;
 static const int HEURISTIC_MULTIPLIER_100 = 100;
 static const int HEURISTIC_MULTIPLIER_50 = 50;
 
-static const int depth = 4; // Level of recursion
+// Level of recursion
+static const int depth = 4; 
 
+// Counters
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
+
+// Booleans
 static bool isPlayerOne = true;
 static bool singlePlayer = true;
 static bool aiTurn;
+
+// Vector of Heuristic Values
 static std::vector<int> heuristicValue;
 
 // Move from start to destination in index
@@ -62,14 +70,14 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
+std::map<int, std::vector<int> > adjacentCells;
+
 //char board[MAX_BOARD_SIZE] = {
 //	'R', 'R', 'R', 'R', ' ', 'R', ' ', 'R', ' ',
 //	'R', 'R', 'R', ' ', 'R', 'R', 'R', 'R', ' ',
 //	' ', ' ', ' ', ' ', 'R', ' ', 'G', ' ', 'G',
 //	'G', 'G', 'G', ' ', 'G', 'G', 'G', ' ', ' ',
 //	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', ' ' };
-
-std::map<int, std::vector<int> > adjacentCells;
 
 // Board setting to win in one move
 //char board[MAX_BOARD_SIZE] = {
@@ -84,7 +92,6 @@ std::map<int, std::vector<int> > adjacentCells;
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
-bool availableSpace(int);
 bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
