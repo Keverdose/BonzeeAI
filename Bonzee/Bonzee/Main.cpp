@@ -20,6 +20,7 @@ static const int ROW_LENGTH     = 9;
 static const int COLUMN_LENGTH  = 5;
 static const int MAX_PIECES_NUM = 22;
 static const int ASCII_LETTER_OFFSET = 48;
+static const int depth = 3; // Level of recursion
 
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
@@ -285,7 +286,7 @@ void ProcessMoveRequest() {
 		// Check if current turn is ai's turn, and it's in singleplayer mode
 		if (isPlayerOne == aiTurn && singlePlayer) {
 			//Get the best move from the ai
-			Move aiMove = getAiMove(3, board, aiTurn);
+			Move aiMove = getAiMove(depth, board, aiTurn);
 			cout << "The ai chooses: " << indexToBoard(aiMove.start) << " " << indexToBoard(aiMove.destination) << endl;
 			attacking(aiMove, board);
 			completedTurn = true;
@@ -597,6 +598,9 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 	if (playerMax) {
 		int highestValue = - 9999999;
 		for (int i = 0; i < allMoves.size(); i++) {
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
 			attacking(allMoves[i], tempBoard);
 			int value = maxSearch(depth - 1, tempBoard, !playerMax);
 			if (value > highestValue) {
@@ -609,6 +613,9 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 	else if (!playerMax) {
 		int lowestValue = 9999999;
 		for (int i = 0; i < allMoves.size(); i++) {
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
 			attacking(allMoves[i], tempBoard);
 			int value = minSearch(depth - 1, tempBoard, !playerMax);
 			if (value < lowestValue) {
@@ -629,11 +636,11 @@ int minSearch(int depth, char* board, bool player) {
 		vector<Move> allMoves = getAllMoves(board, player);
 		char tempBoard[MAX_BOARD_SIZE];
 		int minValue = 999999999;
-		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-			tempBoard[k] = board[k];
-		}
 		for (int i = 0; i < allMoves.size(); i++) {
 			int comparedValue;
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
 			attacking(allMoves[i], tempBoard);
 			comparedValue = maxSearch(depth - 1, tempBoard, !player); 
 			if (comparedValue < minValue) {
@@ -654,10 +661,10 @@ int maxSearch(int depth, char* board, bool player) {
 		vector<Move> allMoves = getAllMoves(board, player);
 		char tempBoard[MAX_BOARD_SIZE];
 		int maxValue = -9999999;
-		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-			tempBoard[k] = board[k];
-		}
 		for (int i = 0; i < allMoves.size(); i++) {
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
 			attacking(allMoves[i], tempBoard);
 			int comparedValue;
 			comparedValue = minSearch(depth - 1, tempBoard, !player);
