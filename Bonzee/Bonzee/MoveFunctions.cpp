@@ -57,7 +57,55 @@ bool MoveFunctions::destinationCheck(int position, int destination, char* board,
 		return MoveFunctions::adjacent(position, destination, adjacentCells);
 }
 
-void MoveFunctions::attacking(Move inputMove, char* currentBoard, std::map<int, std::vector<int>> adjacentCells)
+vector<int> MoveFunctions::checkPossibleMoves(int index, char* updatedBoard, std::map<int, std::vector<int>>& adjacentCells)
+{
+	std::vector<int> moves;
+
+	for (int i = 0; i < adjacentCells[index].size(); i++) {
+		if (updatedBoard[adjacentCells[index].at(i)] == ' ')
+			moves.push_back(adjacentCells[index].at(i));
+	}
+
+	return moves;
+}
+
+vector<Move> MoveFunctions::getAllMoves(char* tempBoard, bool player, std::map<int, std::vector<int>>& adjacentCells)
+{
+	char token;
+	vector<Move> allMoves;
+
+	// Define the token color based on player's turn
+	if (player) {
+		token = 'G';
+	}
+	else {
+		token = 'R';
+	}
+
+	if (!BoardFunctions::winningBoard(tempBoard)) {
+		// Loops through array to check if the token is the current player
+		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+			if (tempBoard[i] == token) {
+
+				// Checks all adjacents
+				Move temp;
+				temp.start = i;	// Setting the starting point of Move 
+
+								// Check all possible valid moves that AI can make on this specific board configuration
+				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard, adjacentCells);
+
+				// Loops through all available adjacents and stores all valid moves
+				for (int j = 0; j < possibleMovesDestination.size(); j++) {
+					temp.destination = possibleMovesDestination[j];
+					allMoves.push_back(temp);
+				}
+			}
+		}
+	}
+	return allMoves;
+}
+
+void MoveFunctions::attacking(Move inputMove, char* currentBoard, std::map<int, std::vector<int>>& adjacentCells)
 {
 
 	// Get the move indices
@@ -94,55 +142,11 @@ void MoveFunctions::attacking(Move inputMove, char* currentBoard, std::map<int, 
 	}
 }
 
-vector<int> MoveFunctions::checkPossibleMoves(int index, char* updatedBoard, std::map<int, std::vector<int>> adjacentCells)
-{
-	std::vector<int> moves;
 
-	for (int i = 0; i < adjacentCells[index].size(); i++) {
-		if (updatedBoard[adjacentCells[index].at(i)] == ' ')
-			moves.push_back(adjacentCells[index].at(i));
-	}
 
-	return moves;
-}
 
-vector<Move> MoveFunctions::getAllMoves(char* tempBoard, bool player, std::map<int, std::vector<int>> adjacentCells)
-{
-	char token;
-	vector<Move> allMoves;
 
-	// Define the token color based on player's turn
-	if (player) {
-		token = 'G';
-	}
-	else {
-		token = 'R';
-	}
-
-	if (!BoardFunctions::winningBoard(tempBoard)) {
-		// Loops through array to check if the token is the current player
-		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
-			if (tempBoard[i] == token) {
-
-				// Checks all adjacents
-				Move temp;
-				temp.start = i;	// Setting the starting point of Move 
-
-								// Check all possible valid moves that AI can make on this specific board configuration
-				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard, adjacentCells);
-
-				// Loops through all available adjacents and stores all valid moves
-				for (int j = 0; j < possibleMovesDestination.size(); j++) {
-					temp.destination = possibleMovesDestination[j];
-					allMoves.push_back(temp);
-				}
-			}
-		}
-	}
-	return allMoves;
-}
-
-void MoveFunctions::ProcessMoveRequest(bool isPlayerOne, bool aiTurn, bool singlePlayer, char* board, std::map<int, std::vector<int>> adjacentCells) {
+void MoveFunctions::ProcessMoveRequest(bool isPlayerOne, bool aiTurn, bool singlePlayer, char* board, std::map<int, std::vector<int>>& adjacentCells) {
 
 	bool completedTurn = false;
 	string answer;

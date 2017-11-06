@@ -52,7 +52,6 @@ std::map<int, std::vector<int> > adjacentCells;
 // -- Function definitions
 void ProcessMoveRequest();
 void attacking(Move, char*);
-vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
 Move getAiMove(int, char*, bool);
@@ -79,19 +78,6 @@ int main() {
 	cout << "Game is over!" << endl;
 
 	cin.get();
-}
-
-// Check the possible moves at given index
-std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
-
-	std::vector<int> moves;
-
-	for (int i = 0; i < adjacentCells[index].size(); i++) {
-		if (updatedBoard[adjacentCells[index].at(i)] == ' ')
-			moves.push_back(adjacentCells[index].at(i));
-	}
-
-	return moves;
 }
 
 // Proceed the move input
@@ -180,47 +166,10 @@ void ProcessMoveRequest() {
 	} while (!completedTurn);
 }
 
-// Loops through the array to add all possible move given the player's token into a vector.
-vector<Move> getAllMoves(char *tempBoard, bool player){
-
-	char token;
-	vector<Move> allMoves;
-
-	// Define the token color based on player's turn
-	if (player) {
-		token = 'G';
-	}
-	else {
-		token = 'R';
-	}
-
-	if (!BoardFunctions::winningBoard(tempBoard)) {
-		// Loops through array to check if the token is the current player
-		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
-			if (tempBoard[i] == token) {
-
-				// Checks all adjacents
-				Move temp;
-				temp.start = i;	// Setting the starting point of Move 
-
-				// Check all possible valid moves that AI can make on this specific board configuration
-				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard);
-
-				// Loops through all available adjacents and stores all valid moves
-				for (int j = 0; j < possibleMovesDestination.size(); j++ ) { 
-					temp.destination = possibleMovesDestination[j];
-					allMoves.push_back(temp);
-				}
-			}
-		}
-	}
-	return allMoves;
-}
-
 // Implements minimax, and returns the best move the ai should take accordingly. 
 Move getAiMove(int depth, char* board, bool playerMax) {
 
-	vector<Move> allMoves = getAllMoves(board, playerMax);
+	vector<Move> allMoves = MoveFunctions::getAllMoves(board, playerMax, adjacentCells);
 	Move aiMove;
 
 	// Make new temp board and copy everything from previous board
@@ -276,11 +225,11 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 int minSearch(int depth, char* board, bool player) {
 
 	// Base case
-	if (depth == 0 || getAllMoves(board, player).empty()) {
+	if (depth == 0 || MoveFunctions::getAllMoves(board, player, adjacentCells).empty()) {
 		return HeuristicFunctions::Heuristic(board);
 	}
 	else {
-		vector<Move> allMoves = getAllMoves(board, player);
+		vector<Move> allMoves = MoveFunctions::getAllMoves(board, player, adjacentCells);
 		char tempBoard[MAX_BOARD_SIZE];
 		int minValue = 999999999;
 		for (int i = 0; i < allMoves.size(); i++) {
@@ -301,11 +250,11 @@ int minSearch(int depth, char* board, bool player) {
 
 // Maximize the win condition (Recursion)
 int maxSearch(int depth, char* board, bool player) {
-	if (depth == 0 || getAllMoves(board, player).empty()) {
+	if (depth == 0 || MoveFunctions::getAllMoves(board, player, adjacentCells).empty()) {
 		return HeuristicFunctions::Heuristic(board);
 	}
 	else {
-		vector<Move> allMoves = getAllMoves(board, player);
+		vector<Move> allMoves = MoveFunctions::getAllMoves(board, player, adjacentCells);
 		char tempBoard[MAX_BOARD_SIZE];
 		int maxValue = -9999999;
 		for (int i = 0; i < allMoves.size(); i++) {
