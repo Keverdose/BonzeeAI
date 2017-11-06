@@ -84,7 +84,6 @@ std::map<int, std::vector<int> > adjacentCells;
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
-bool availableSpace(int);
 bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
