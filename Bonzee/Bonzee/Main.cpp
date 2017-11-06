@@ -31,8 +31,8 @@ static const int HEURISTIC_MULTIPLIER_50 = 50;
 static const int depth = 4; 
 
 // Counters
-static int greenCounter = MAX_PIECES_NUM;
-static int redCounter   = MAX_PIECES_NUM;
+//static int greenCounter = MAX_PIECES_NUM;
+//static int redCounter   = MAX_PIECES_NUM;
 
 // Booleans
 static bool isPlayerOne = true;
@@ -98,7 +98,7 @@ bool destinationCheck(int, int);
 int BoardToIndex(string);
 void attacking(Move, char*);
 bool adjacent(int, int);
-void tokenCountUpdate();
+//void tokenCountUpdate();
 int Heuristic(char*);
 int getRowIndex(int);
 int getColumnIndex(int);
@@ -659,18 +659,17 @@ void attacking(Move inputMove, char* currentBoard) {
 			currentBoard[target] = ' ';
 			tempPosition = target;
 			target += direction;
-			//tokenCountUpdate();
 		}
 	}
 }
 
-// Decrements token count depending on player's turn
-void tokenCountUpdate() {
-	if (isPlayerOne) 
-		redCounter--;    // Decrement red token count
-	else 
-		greenCounter--;  // Decrement green token count
-}
+//// Decrements token count depending on player's turn
+//void tokenCountUpdate() {
+//	if (isPlayerOne) 
+//		redCounter--;    // Decrement red token count
+//	else 
+//		greenCounter--;  // Decrement green token count
+//}
 
 int Heuristic(char* tempBoard) {
 	/*
