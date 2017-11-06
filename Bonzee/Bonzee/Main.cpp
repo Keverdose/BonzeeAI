@@ -57,9 +57,7 @@ std::map<int, std::vector<int> > adjacentCells;
 
 // -- Function definitions
 void ProcessMoveRequest();
-bool IsValidChoice(string);
 bool destinationCheck(int, int);
-int BoardToIndex(string);
 void attacking(Move, char*);
 bool adjacent(int, int);
 void tokenCountUpdate();
@@ -269,9 +267,9 @@ void ProcessMoveRequest() {
 				cout << "  Position: " << choice << "; Destination: " << destination << endl;
 
 				// Checks if the two coordinates are within the array, if so then continue. else, prompt again
-				if (IsValidChoice(choice) && IsValidChoice(destination)) {
-					choIndex = BoardToIndex(choice);
-					destIndex = BoardToIndex(destination);
+				if (MoveFunctions::IsValidChoice(choice) && MoveFunctions::IsValidChoice(destination)) {
+					choIndex = MoveFunctions::BoardToIndex(choice);
+					destIndex = MoveFunctions::BoardToIndex(destination);
 
 
 					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
@@ -322,42 +320,6 @@ bool adjacent(int position, int destination) {
 	}
 
 	return false;
-}
-
-// Method to check whether the choice is in the board or not
-bool IsValidChoice(string choice) {
-	if (choice == "") 
-		return false; 
-
-	char inputChar = choice.at(0);
-
-	if (inputChar == 'A' || inputChar == 'B' || inputChar == 'C' || inputChar == 'D' || inputChar == 'E') {
-		if ((int)choice.at(1) - ASCII_LETTER_OFFSET > 0 && (int)choice.at(1) - ASCII_LETTER_OFFSET <= ROW_LENGTH)
-			return true; 
-	}
-
-	return false;
-}
-
-
-// Method to change the coordinates to arrayIndex
-int BoardToIndex(string choice) {
-	char row = choice.at(0);
-	int offset;
-	switch (tolower(row)) {
-		case 'a': offset = 0;
-			break;
-		case 'b': offset = 1;
-			break;
-		case 'c': offset = 2;
-			break;
-		case 'd': offset = 3;
-			break;
-		case 'e': offset = 4;
-			break;
-	}
-
-	return (offset * ROW_LENGTH + (int)choice.at(1) - ASCII_LETTER_OFFSET - 1);
 }
 
 // Loops through the array to add all possible move given the player's token into a vector.
