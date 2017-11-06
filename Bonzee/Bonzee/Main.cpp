@@ -51,7 +51,6 @@ std::map<int, std::vector<int> > adjacentCells;
 
 // -- Function definitions
 void ProcessMoveRequest();
-void attacking(Move, char*);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
 Move getAiMove(int, char*, bool);
@@ -98,7 +97,7 @@ void ProcessMoveRequest() {
 
 			// Display and Input the AI move
 			cout << "The ai chooses: " << HeuristicFunctions::indexToBoard(aiMove.start) << " " << HeuristicFunctions::indexToBoard(aiMove.destination) << endl;
-			attacking(aiMove, board);
+			MoveFunctions::attacking(aiMove, board, adjacentCells);
 
 			// End Timer after AI inputted best move
 			clock_t end = clock();
@@ -150,7 +149,7 @@ void ProcessMoveRequest() {
 						userMove.destination = destIndex;
 
 						// Execute Attack Algorithm
-						attacking(userMove, board);
+						MoveFunctions::attacking(userMove, board, adjacentCells);
 
 						completedTurn = true;
 					}
@@ -186,7 +185,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 				tempBoard[k] = board[k];
 			}
-			attacking(allMoves[i], tempBoard); // Perform attack on each valid move
+			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells); // Perform attack on each valid move
 			int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
 
 			if (value > highestValue) {
@@ -207,7 +206,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 				tempBoard[k] = board[k];
 			}
 
-			attacking(allMoves[i], tempBoard);	// Perform attack on each valid move
+			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);	// Perform attack on each valid move
 			int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
 
 			if (value < lowestValue) {
@@ -237,7 +236,7 @@ int minSearch(int depth, char* board, bool player) {
 			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 				tempBoard[k] = board[k];
 			}
-			attacking(allMoves[i], tempBoard);
+			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);
 			comparedValue = maxSearch(depth - 1, tempBoard, !player); 
 			if (comparedValue < minValue) {
 				minValue = comparedValue;
@@ -261,7 +260,7 @@ int maxSearch(int depth, char* board, bool player) {
 			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 				tempBoard[k] = board[k];
 			}
-			attacking(allMoves[i], tempBoard);
+			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);
 			int comparedValue;
 			comparedValue = minSearch(depth - 1, tempBoard, !player);
 			if (comparedValue > maxValue) {
@@ -269,41 +268,5 @@ int maxSearch(int depth, char* board, bool player) {
 			}
 		}
 		return maxValue;
-	}
-}
-
-// Method to process the attacking
-void attacking(Move inputMove, char* currentBoard) {
-
-	// Get the move indices
-	int dest = inputMove.destination;
-	int pos = inputMove.start;
-
-	// Move attacking token forward/backward 
-	char playerToken = currentBoard[pos];
-	currentBoard[dest] = currentBoard[pos];
-	currentBoard[pos] = ' ';
-
-	// Forward Attack 
-	int direction    = dest - pos;
-	int tempPosition = dest;
-	int target       = dest + direction;
-	char targetColor = currentBoard[target];
-
-	// Backward attack: Check If destination is on board edge AND If target cell is empty or same color as initial position token
-	if (target < 0 || target > MAX_BOARD_SIZE || targetColor == ' ' || targetColor == playerToken || (dest % ROW_LENGTH == 0 && (direction == -1 || direction == -(ROW_LENGTH + 1) || direction == (ROW_LENGTH - 1) )) || (dest % ROW_LENGTH == (ROW_LENGTH - 1) && (direction == 1 || direction == (ROW_LENGTH + 1) || direction == -(ROW_LENGTH - 1)))) {
-		direction *= -1;
-		tempPosition = pos;
-		target       = pos + direction;
-		targetColor  = currentBoard[target];
-	}
-	
-	// Begin attack loop
-	if (currentBoard[pos] != targetColor) {
-		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == currentBoard[target]) && MoveFunctions::adjacent(tempPosition, target, adjacentCells) && currentBoard[target] != ' ' && currentBoard[target] != playerToken) {
-			currentBoard[target] = ' ';
-			tempPosition = target;
-			target += direction;
-		}
 	}
 }

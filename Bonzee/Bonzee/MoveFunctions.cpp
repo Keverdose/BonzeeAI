@@ -137,7 +137,6 @@ void MoveFunctions::attacking(Move inputMove, char* currentBoard, std::map<int, 
 			currentBoard[target] = ' ';
 			tempPosition = target;
 			target += direction;
-			//MoveFunctions::tokenCountUpdate(greenCounter, redCounter, isPlayerOne);
 		}
 	}
 }
