@@ -14,6 +14,5 @@ public:
 	static vector<int> checkPossibleMoves(int, char*, std::map<int, std::vector<int>>&);
 	static vector<Move> getAllMoves(char*, bool, std::map<int, std::vector<int>>&);
 	static void attacking(Move, char*, std::map<int, std::vector<int>>&);
-
 	static void ProcessMoveRequest(bool, bool, bool, char*, std::map<int, std::vector<int>>&);
 };

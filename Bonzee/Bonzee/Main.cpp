@@ -49,9 +49,6 @@ std::map<int, std::vector<int> > adjacentCells;
 //	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 //	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
-// -- Function definitions
-void ProcessMoveRequest();
-
 int main() {
 
 	// Generate the Map for all indices
@@ -63,7 +60,7 @@ int main() {
 	while (!BoardFunctions::winningBoard(board)) {
 		
 		BoardFunctions::PrintBoard(board);
-		ProcessMoveRequest();
+		MoveFunctions::ProcessMoveRequest(isPlayerOne, aiTurn, singlePlayer, board, adjacentCells);
 		isPlayerOne = !isPlayerOne;
 		// cin.get();
 		cout << "Current Board Heuristic: " << HeuristicFunctions::Heuristic(board) << endl;
@@ -74,90 +71,4 @@ int main() {
 	cout << "Game is over!" << endl;
 
 	cin.get();
-}
-
-// Proceed the move input
-void ProcessMoveRequest() {
-
-	bool completedTurn = false;
-	string answer;
-
-	do {
-		// Check if current turn is ai's turn, and it's in singleplayer mode
-		if (isPlayerOne == aiTurn && singlePlayer) {
-
-			// Start Timer before AI checks for best move
-			clock_t start = clock();
-
-			// Get the best move from the ai (Via recursion)
-			Move aiMove = HeuristicFunctions::getAiMove(DEPTH, board, aiTurn, adjacentCells);
-
-			// Display and Input the AI move
-			cout << "The ai chooses: " << HeuristicFunctions::indexToBoard(aiMove.start) << " " << HeuristicFunctions::indexToBoard(aiMove.destination) << endl;
-			MoveFunctions::attacking(aiMove, board, adjacentCells);
-
-			// End Timer after AI inputted best move
-			clock_t end = clock();
-			double elapsedTime = double(end - start) / CLOCKS_PER_SEC;
-			cout << "Elapsed time: " << elapsedTime << " seconds " << endl;
-
-			completedTurn = true;
-		}
-
-		// else let the player play
-		else {
-			if (isPlayerOne)
-				cout << "Player One's Turn (Green). \n  Please enter move: ";
-			else
-				cout << "Player Two's Turn (Red). \n  Please enter move: ";
-
-			getline(cin, answer);
-			transform(answer.begin(), answer.end(), answer.begin(), ::toupper); // Transforms input into lowercase 
-
-			// Input Validation
-			if (answer.length() != 5)
-				cout << "Invalid String given, please try again." << endl;
-
-
-			else if (answer.at(2) != ' ')
-				cout << "Invalid String given, please try again." << endl;
-
-			// Process Input
-			else {
-				// Transforms the answer into two coordinates
-				int choIndex, destIndex;
-				string choice = { answer.at(0), answer.at(1) };
-				string destination = { answer.at(3), answer.at(4) };
-
-				cout << "\nPlayer Input: " << endl;
-				cout << "  Position: " << choice << "; Destination: " << destination << endl;
-
-				// Checks if the two coordinates are within the array, if so then continue. else, prompt again
-				if (MoveFunctions::IsValidChoice(choice) && MoveFunctions::IsValidChoice(destination)) {
-					choIndex = MoveFunctions::BoardToIndex(choice);
-					destIndex = MoveFunctions::BoardToIndex(destination);
-
-
-					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-					if (BoardFunctions::isValid(isPlayerOne, board[choIndex]) && MoveFunctions::destinationCheck(choIndex, destIndex, board, adjacentCells)) {
-
-						Move userMove;
-						userMove.start = choIndex;
-						userMove.destination = destIndex;
-
-						// Execute Attack Algorithm
-						MoveFunctions::attacking(userMove, board, adjacentCells);
-
-						completedTurn = true;
-					}
-
-					else
-						cout << "This is an invalid move. Please try again." << endl;
-				}
-				else
-					cout << "Invalid positions, please try again." << endl;
-			}
-
-		}
-	} while (!completedTurn);
 }

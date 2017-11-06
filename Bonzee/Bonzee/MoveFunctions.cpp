@@ -141,10 +141,6 @@ void MoveFunctions::attacking(Move inputMove, char* currentBoard, std::map<int, 
 	}
 }
 
-
-
-
-
 void MoveFunctions::ProcessMoveRequest(bool isPlayerOne, bool aiTurn, bool singlePlayer, char* board, std::map<int, std::vector<int>>& adjacentCells) {
 
 	bool completedTurn = false;
