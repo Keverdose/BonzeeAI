@@ -77,7 +77,7 @@ int HeuristicFunctions::Heuristic(char* tempBoard)
 	return (HEURISTIC_MULTIPLIER_100 * horizontalGreenVal) + (HEURISTIC_MULTIPLIER_50 * verticalGreenVal) - (HEURISTIC_MULTIPLIER_100 * horizontalRedVal) - (HEURISTIC_MULTIPLIER_50 * verticalRedVal);
 }
 
-int HeuristicFunctions::maxSearch(int depth, char* board, bool player, std::map<int, std::vector<int>> adjacentCells)
+int HeuristicFunctions::maxSearch(int depth, char* board, bool player, std::map<int, std::vector<int>>& adjacentCells)
 {
 	if (depth == 0 || MoveFunctions::getAllMoves(board, player, adjacentCells).empty()) {
 		return HeuristicFunctions::Heuristic(board);
@@ -101,7 +101,7 @@ int HeuristicFunctions::maxSearch(int depth, char* board, bool player, std::map<
 	}
 }
 
-int HeuristicFunctions::minSearch(int depth, char* board, bool player, std::map<int, std::vector<int>> adjacentCells)
+int HeuristicFunctions::minSearch(int depth, char* board, bool player, std::map<int, std::vector<int>>& adjacentCells)
 {
 
 	// Base case
@@ -127,7 +127,7 @@ int HeuristicFunctions::minSearch(int depth, char* board, bool player, std::map<
 	}
 }
 
-Move HeuristicFunctions::getAiMove(int depth, char* board, bool playerMax, std::map<int, std::vector<int>> adjacentCells)
+Move HeuristicFunctions::getAiMove(int depth, char* board, bool playerMax, std::map<int, std::vector<int>>& adjacentCells)
 {
 	vector<Move> allMoves = MoveFunctions::getAllMoves(board, playerMax, adjacentCells);
 	Move aiMove;

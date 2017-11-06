@@ -51,8 +51,6 @@ std::map<int, std::vector<int> > adjacentCells;
 
 // -- Function definitions
 void ProcessMoveRequest();
-int minSearch(int, char*, bool);
-int maxSearch(int, char*, bool);
 Move getAiMove(int, char*, bool);
 
 int main() {
@@ -186,7 +184,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 				tempBoard[k] = board[k];
 			}
 			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells); // Perform attack on each valid move
-			int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+			int value = HeuristicFunctions::maxSearch(depth - 1, tempBoard, !playerMax, adjacentCells); // Value contains the best heuristic value 
 
 			if (value > highestValue) {
 				cout << "Move updated because last move's heuristic: " << highestValue << ", and current new move's heuristic: " << value << endl;
@@ -207,7 +205,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 			}
 
 			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);	// Perform attack on each valid move
-			int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+			int value = HeuristicFunctions::minSearch(depth - 1, tempBoard, !playerMax, adjacentCells); // Value contains the best heuristic value 
 
 			if (value < lowestValue) {
 				cout << "Move updated because last move's heuristic: " << lowestValue << ", and current new move's heuristic: " << value << endl;
@@ -218,55 +216,4 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 	}
 
 	return aiMove; // Returns the ai's move.
-}
-
-// Minimize the win condition (Recursion)
-int minSearch(int depth, char* board, bool player) {
-
-	// Base case
-	if (depth == 0 || MoveFunctions::getAllMoves(board, player, adjacentCells).empty()) {
-		return HeuristicFunctions::Heuristic(board);
-	}
-	else {
-		vector<Move> allMoves = MoveFunctions::getAllMoves(board, player, adjacentCells);
-		char tempBoard[MAX_BOARD_SIZE];
-		int minValue = 999999999;
-		for (int i = 0; i < allMoves.size(); i++) {
-			int comparedValue;
-			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-				tempBoard[k] = board[k];
-			}
-			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);
-			comparedValue = maxSearch(depth - 1, tempBoard, !player); 
-			if (comparedValue < minValue) {
-				minValue = comparedValue;
-			}
-		}
-		return minValue;
-	}
-
-}
-
-// Maximize the win condition (Recursion)
-int maxSearch(int depth, char* board, bool player) {
-	if (depth == 0 || MoveFunctions::getAllMoves(board, player, adjacentCells).empty()) {
-		return HeuristicFunctions::Heuristic(board);
-	}
-	else {
-		vector<Move> allMoves = MoveFunctions::getAllMoves(board, player, adjacentCells);
-		char tempBoard[MAX_BOARD_SIZE];
-		int maxValue = -9999999;
-		for (int i = 0; i < allMoves.size(); i++) {
-			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-				tempBoard[k] = board[k];
-			}
-			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);
-			int comparedValue;
-			comparedValue = minSearch(depth - 1, tempBoard, !player);
-			if (comparedValue > maxValue) {
-				maxValue = comparedValue;
-			}
-		}
-		return maxValue;
-	}
 }
