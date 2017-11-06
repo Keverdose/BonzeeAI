@@ -9,4 +9,5 @@ public:
 	static bool winningBoard(char*);
 	static bool isValid(bool, char);
 	static void generateMap(int, int, int, std::map<int, std::vector<int>>&);
+	static void singleOrMultiplayer(bool&, bool&);
 };

@@ -58,8 +58,6 @@ vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
 Move getAiMove(int, char*, bool);
-void singleOrMultiplayer();
-
 
 int main() {
 
@@ -68,7 +66,7 @@ int main() {
 		BoardFunctions::generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH, adjacentCells);
 	}
 
-	singleOrMultiplayer();
+	BoardFunctions::singleOrMultiplayer(aiTurn, singlePlayer);
 	while (!BoardFunctions::winningBoard(board)) {
 		
 		BoardFunctions::PrintBoard(board);
@@ -96,65 +94,6 @@ std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
 	}
 
 	return moves;
-}
-
-// Method to decide whether it's multiplayer or single player
-void singleOrMultiplayer() {
-
-	bool modeChosen = false;
-
-	do {
-		// Ask and process input
-		cout << "Would you like to play singleplayer (vs AI) or multiplayer (vs Human) (S/M): ";
-		string answer = "";
-		getline(cin, answer);
-		transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
-
-		// Input Check
-		if (answer.length() != 1 ) {
-			cout << "Invalid choice, please try again: ";
-		}
-
-		else {
-			// If user chooses singleplayer mode, make him choose the AI's Token.
-			if (answer.at(0) == 'S') {
-
-				bool aiTokenChosen = false;
-				
-				do {
-					// Ask and process input
-					cout << "> Singleplayer mode chosen. \n> You will play against a minimax A.I. \n\nWhich token will the A.I. play? (R/G): ";
-					string aiChoice = "";
-					getline(cin, aiChoice);
-					transform(aiChoice.begin(), aiChoice.end(), aiChoice.begin(), ::toupper);
-					
-					// Input Check
-					if (aiChoice.length() != 1 || (aiChoice.at(0) != 'R' && aiChoice.at(0) != 'G')) {
-						cout << "Invalid token, please try again: ";
-					}
-
-					else {
-						// AI is Red Token, starts 2nd
-						if (aiChoice.at(0) == 'R') {
-							aiTurn = false;
-						}
-						// AI is Green Token, starts 1st
-						else {
-							aiTurn = true;
-						}
-						aiTokenChosen = true;
-					}
-				} while (!aiTokenChosen);
-			}
-
-			// If user chooses multiplayer mode, exit normally
-			if (answer.at(0) == 'M') {
-				cout << "Multiplayer mode chosen." << endl;
-				singlePlayer = false;
-			}
-			modeChosen = true;
-		}
-	} while (!modeChosen);
 }
 
 // Proceed the move input
