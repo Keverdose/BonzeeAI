@@ -64,9 +64,6 @@ void attacking(Move, char*);
 bool adjacent(int, int);
 void tokenCountUpdate();
 int Heuristic(char*);
-int getRowIndex(int);
-int getColumnIndex(int);
-string indexToBoard(int);
 vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
@@ -232,7 +229,7 @@ void ProcessMoveRequest() {
 			Move aiMove = getAiMove(DEPTH, board, aiTurn);
 
 			// Display and Input the AI move
-			cout << "The ai chooses: " << indexToBoard(aiMove.start) << " " << indexToBoard(aiMove.destination) << endl;
+			cout << "The ai chooses: " << HeuristicFunctions::indexToBoard(aiMove.start) << " " << HeuristicFunctions::indexToBoard(aiMove.destination) << endl;
 			attacking(aiMove, board);
 
 			// End Timer after AI inputted best move
@@ -362,35 +359,6 @@ int BoardToIndex(string choice) {
 
 	return (offset * ROW_LENGTH + (int)choice.at(1) - ASCII_LETTER_OFFSET - 1);
 }
-
-// Method to transform an index to Board coordinates  <-- THIS IS FOR THE AI
-string indexToBoard(int index) {
-	int charVal = index / 9;
-	int columnValue = index % 9 + 1;
-	char rowValue;
-	// A = 0, B = 1, C = 2, D = 3, E = 4
-	if (charVal == 0) {
-		rowValue = 'a';
-	}
-	else if (charVal == 1) {
-		rowValue = 'b';
-	}
-	else if (charVal == 2) {
-		rowValue = 'c';
-	}
-	else if (charVal == 3) {
-		rowValue = 'd';
-	}
-	else if (charVal == 4) {
-		rowValue = 'e';
-	}
-	string temp = "";
-	temp += rowValue;
-	temp += std::to_string(index % 9 + 1);
-
-	return temp;
-}
-
 
 // Loops through the array to add all possible move given the player's token into a vector.
 vector<Move> getAllMoves(char *tempBoard, bool player){
@@ -596,36 +564,16 @@ int Heuristic(char* tempBoard) {
 	for (int i = 0; i < MAX_BOARD_SIZE; i++){
 		if (tempBoard[i] == 'G'){
 			/*visitedGreen--;*/
-			verticalGreenVal += getColumnIndex(i);
-			horizontalGreenVal += getRowIndex(i);
+			verticalGreenVal += HeuristicFunctions::getColumnIndex(i);
+			horizontalGreenVal += HeuristicFunctions::getRowIndex(i);
 		}
 		if (tempBoard[i] == 'R'){
 			//visitedRed--;
-			verticalRedVal += getColumnIndex(i);
-			horizontalRedVal += getRowIndex(i);
+			verticalRedVal += HeuristicFunctions::getColumnIndex(i);
+			horizontalRedVal += HeuristicFunctions::getRowIndex(i);
 		}
 	}
 	
 	// Return the heuristic value
 	return (HEURISTIC_MULTIPLIER_100 * horizontalGreenVal) + (HEURISTIC_MULTIPLIER_50 * verticalGreenVal) - (HEURISTIC_MULTIPLIER_100 * horizontalRedVal) - (HEURISTIC_MULTIPLIER_50 * verticalRedVal);
 }
-
-// Takes in a board index and returns its row index # (i.e. 27 returns 4 since D = 4)
-// TODO make this into a struct to return both row and column index
-int getRowIndex(int index){
-	float val = index / ROW_LENGTH;
-	
-	// A = 1, B = 2, C = 3, D = 4, E = 5
-	if (val < 0 || val > 5) {
-		return -1;
-	}
-	else {
-		return val + 1;
-	}
-}
-
-// Takes in a board index and returns its column index # (i.e. 27 returns 1 because it's in the 1st column)
-int getColumnIndex(int index){
-	return (index % ROW_LENGTH) + 1;
-}
-
