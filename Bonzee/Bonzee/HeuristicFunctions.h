@@ -18,7 +18,5 @@ public:
 	
 
 
-	/*
-	
-	void generateMap(int, int, int);*/
+
 };

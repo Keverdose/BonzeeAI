@@ -50,3 +50,46 @@ bool BoardFunctions::isValid(bool isPlayerOne, char color)
 	else
 		return (color == 'R');
 }
+
+void BoardFunctions::generateMap(int index, int boardSize, int row_length, std::map<int, std::vector<int>>& adjacentCells)
+{
+	// Insert a new entry into the Map
+	adjacentCells.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
+
+	// ============ Check Left Bound ============ 
+	if (index % row_length != 0) {
+
+		// -- Add Upper Left Diagonal Index
+		if ((index > row_length) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index - (row_length + 1));
+		}
+		// -- Add Lower Left Diagonal Index
+		if ((index < (boardSize - row_length)) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index + (row_length - 1));
+		}
+		// Add Left Index
+		adjacentCells[index].push_back(index - 1);
+	}
+
+	// ============ Check Right Bound ============  
+	if ((index % (row_length)) != (row_length - 1)) {
+
+		// -- Add Upper Right Diagonal Index
+		if ((index > (row_length - 1)) && (index % 2 == 0)) {
+			adjacentCells[index].push_back((index - row_length) + 1);
+		}
+		// -- Add Lower Right Diagonal Index
+		if ((index < boardSize - row_length) && (index % 2 == 0)) {
+			adjacentCells[index].push_back(index + (row_length + 1));
+		}
+		// Add Right Index
+		adjacentCells[index].push_back(index + 1);
+	}
+
+	// Add Top Index
+	if (index >(row_length - 1))
+		adjacentCells[index].push_back(index - row_length);
+	// Add Bottom Index
+	if (index < (boardSize - row_length))
+		adjacentCells[index].push_back(index + row_length);
+}
