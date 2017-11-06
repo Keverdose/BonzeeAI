@@ -1,34 +1,7 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <vector>
-
-#include <ctime>
-
-// -- Namespaces
-using std::cout;
-using std::endl;
-using std::cin;
-using std::string;
-using std::transform;
-using std::vector;
-
-// =========== Variable definitions =========== 
-
-// Constants
-static const int MAX_BOARD_SIZE = 45;
-static const int EMPTY_BOARD    = 0;
-static const int ROW_LENGTH     = 9;
-static const int COLUMN_LENGTH  = 5;
-static const int MAX_PIECES_NUM = 22;
-static const int ASCII_LETTER_OFFSET = 48;
-static const int HEURISTIC_MULTIPLIER_100 = 100;
-static const int HEURISTIC_MULTIPLIER_50 = 50;
-
-// Level of recursion
-static const int depth = 4; 
+#include "CommonIncludes.h"
+#include "BoardFunctions.h"
+#include "MoveFunctions.h"
+#include "HeuristicFunctions.h"
 
 // Counters
 static int greenCounter = MAX_PIECES_NUM;
@@ -41,13 +14,6 @@ static bool aiTurn;
 
 // Vector of Heuristic Values
 static std::vector<int> heuristicValue;
-
-// Move from start to destination in index
-struct Move {
-	int start;
-	int destination;
-};
-
 
 /* BOARD LAYOUT:
 	1  2  3  4  5  6  7  8  9
@@ -90,9 +56,7 @@ std::map<int, std::vector<int> > adjacentCells;
 // redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
 
 // -- Function definitions
-void PrintBoard();
 void ProcessMoveRequest();
-bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
 int BoardToIndex(string);
@@ -103,7 +67,6 @@ int Heuristic(char*);
 int getRowIndex(int);
 int getColumnIndex(int);
 string indexToBoard(int);
-bool winningBoard(char*);
 vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
@@ -120,9 +83,9 @@ int main() {
 	}
 
 	singleOrMultiplayer();
-	while (!winningBoard(board)) {
+	while (!BoardFunctions::winningBoard(board)) {
 		
-		PrintBoard();
+		BoardFunctions::PrintBoard(board);
 		ProcessMoveRequest();
 		isPlayerOne = !isPlayerOne;
 		// cin.get();
@@ -130,7 +93,7 @@ int main() {
 	}
 
 	// Post Game Display
-	PrintBoard();
+	BoardFunctions::PrintBoard(board);
 	cout << "Game is over!" << endl;
 
 	cin.get();
@@ -252,33 +215,6 @@ void singleOrMultiplayer() {
 	} while (!modeChosen);
 }
 
-
-// Function to Print Current Board Configuration
-void PrintBoard() {
-	cout << "\n\n ======================== B O N Z E E ======================= " << endl;
-	cout << "\n       1     2     3     4     5     6     7     8     9";
-
-	char startLetter = 'A';
-
-	for (auto i = 0; i < MAX_BOARD_SIZE; i++) {
-		
-		// Prints the Line Letter
-		if (i % ROW_LENGTH == 0) {
-			cout << "\n\n  " << (char)(startLetter + (i / ROW_LENGTH)) << " ";
-		}
-
-		// Prints Content of the Line 
-		if (i % 2 == 0)
-			cout << " [ " << board[i] << " ]";  // Black Square 
-		else
-			cout << " ( " << board[i] << " )";  // White Square	
-	}
-
-	cout << "\n\n  Black Cells Denoted By: [ ] - White Cells Denoted By: ( )";
-	cout << "\n ============================================================\n" << endl;
-
-}
-
 // Proceed the move input
 void ProcessMoveRequest() {
 
@@ -293,7 +229,7 @@ void ProcessMoveRequest() {
 			clock_t start = clock();
 
 			// Get the best move from the ai (Via recursion)
-			Move aiMove = getAiMove(depth, board, aiTurn);
+			Move aiMove = getAiMove(DEPTH, board, aiTurn);
 
 			// Display and Input the AI move
 			cout << "The ai chooses: " << indexToBoard(aiMove.start) << " " << indexToBoard(aiMove.destination) << endl;
@@ -342,7 +278,7 @@ void ProcessMoveRequest() {
 
 
 					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-					if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
+					if (BoardFunctions::isValid(isPlayerOne, board[choIndex]) && destinationCheck(choIndex, destIndex)) {
 
 						Move userMove;
 						userMove.start = choIndex;
@@ -390,16 +326,6 @@ bool adjacent(int position, int destination) {
 
 	return false;
 }
-
-
-// Method to check whether green or red is playing.
-bool isValid(char color) {
-	if (isPlayerOne)
-		return (color == 'G');
-	else
-		return (color == 'R');
-}
-
 
 // Method to check whether the choice is in the board or not
 bool IsValidChoice(string choice) {
@@ -480,7 +406,7 @@ vector<Move> getAllMoves(char *tempBoard, bool player){
 		token = 'R';
 	}
 
-	if (!winningBoard(tempBoard)) {
+	if (!BoardFunctions::winningBoard(tempBoard)) {
 		// Loops through array to check if the token is the current player
 		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
 			if (tempBoard[i] == token) {
@@ -607,24 +533,6 @@ int maxSearch(int depth, char* board, bool player) {
 		}
 		return maxValue;
 	}
-}
-
-// Check if either player wins.
-bool winningBoard(char* board) {
-	int gcounter = 0;
-	int rcounter = 0;
-	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
-		if (board[i] == 'G') {
-			gcounter++;
-		}
-		else if (board[i] == 'R') {
-			rcounter++;
-		}
-
-		if (gcounter > 0 && rcounter > 0)
-			return false;
-	}
-	return (gcounter == 0 || rcounter == 0);
 }
 
 // Method to process the attacking

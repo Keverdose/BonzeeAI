@@ -2,7 +2,6 @@
 
 void BoardFunctions::PrintBoard(char* board)
 {
-	cout << "\n\nBlack Cells Denoted By: [ ]\nWhite Cells Denoted By: ( )";
 	cout << "\n\n ======================== B O N Z E E ======================= " << endl;
 	cout << "\n       1     2     3     4     5     6     7     8     9";
 
@@ -22,25 +21,26 @@ void BoardFunctions::PrintBoard(char* board)
 			cout << " ( " << board[i] << " )";  // White Square	
 	}
 
-	cout << "\n\n ============================================================\n" << endl;
+	cout << "\n\n  Black Cells Denoted By: [ ] - White Cells Denoted By: ( )";
+	cout << "\n ============================================================\n" << endl;
 }
 
-void BoardFunctions::checkWin(int greenCounter, int redCounter, char* board)
-{
-	if (greenCounter <= 0) {
-		BoardFunctions::PrintBoard(board);
-		cout << "Game Over! Red Wins!";
-	}
+// Check if either player wins.
+bool BoardFunctions::winningBoard(char* board) {
+	int gcounter = 0;
+	int rcounter = 0;
+	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+		if (board[i] == 'G') {
+			gcounter++;
+		}
+		else if (board[i] == 'R') {
+			rcounter++;
+		}
 
-	else if (redCounter <= 0) {
-		BoardFunctions::PrintBoard(board);
-		cout << "Game Over! Green Wins!";
+		if (gcounter > 0 && rcounter > 0)
+			return false;
 	}
-}
-
-bool BoardFunctions::isGameOver(int greenCounter, int redCounter)
-{
-	return (greenCounter <= EMPTY_BOARD || redCounter <= EMPTY_BOARD);
+	return (gcounter == 0 || rcounter == 0);
 }
 
 bool BoardFunctions::isValid(bool isPlayerOne, char color)
@@ -49,9 +49,4 @@ bool BoardFunctions::isValid(bool isPlayerOne, char color)
 		return (color == 'G');
 	else
 		return (color == 'R');
-}
-
-bool BoardFunctions::changePlayer(bool isPlayerOne)
-{
-	return (!isPlayerOne);
 }

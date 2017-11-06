@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <ctime>
 
 // -- Namespaces
 using std::cout;
@@ -24,3 +25,8 @@ const int ASCII_LETTER_OFFSET = 48;
 const int HEURISTIC_MULTIPLIER_100 = 100;
 const int HEURISTIC_MULTIPLIER_50 = 50;
 const int DEPTH = 4;
+
+struct Move {
+	int start;
+	int destination;
+};
