@@ -53,7 +53,6 @@ std::map<int, std::vector<int> > adjacentCells;
 void ProcessMoveRequest();
 bool destinationCheck(int, int);
 void attacking(Move, char*);
-bool adjacent(int, int);
 vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
@@ -192,19 +191,7 @@ bool destinationCheck(int position, int destination) {
 
 	//Else check if the cell is adjacent to position.
 	else 
-		return adjacent(position, destination);
-}
-
-
-// New Adjacent Function that looks up the map for adjacent cells
-bool adjacent(int position, int destination) {
-
-	for (int i = 0; i < adjacentCells[position].size(); i++) {
-		if (adjacentCells[position].at(i) == destination)
-			return true;
-	}
-
-	return false;
+		return MoveFunctions::adjacent(position, destination, adjacentCells);
 }
 
 // Loops through the array to add all possible move given the player's token into a vector.
@@ -378,7 +365,7 @@ void attacking(Move inputMove, char* currentBoard) {
 	
 	// Begin attack loop
 	if (currentBoard[pos] != targetColor) {
-		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == currentBoard[target]) && adjacent(tempPosition, target) && currentBoard[target] != ' ' && currentBoard[target] != playerToken) {
+		while (target < MAX_BOARD_SIZE && target > -1 && (targetColor == currentBoard[target]) && MoveFunctions::adjacent(tempPosition, target, adjacentCells) && currentBoard[target] != ' ' && currentBoard[target] != playerToken) {
 			currentBoard[target] = ' ';
 			tempPosition = target;
 			target += direction;

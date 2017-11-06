@@ -35,7 +35,7 @@ int MoveFunctions::BoardToIndex(string choice){
 	return (offset * ROW_LENGTH + (int)choice.at(1) - ASCII_LETTER_OFFSET - 1);
 }
 
-bool MoveFunctions::adjacent(int position, int destination, std::map<int, std::vector<int>> adjacentCells)
+bool MoveFunctions::adjacent(int position, int destination, std::map<int, std::vector<int>>& adjacentCells)
 {
 	for (int i = 0; i < adjacentCells[position].size(); i++) {
 		if (adjacentCells[position].at(i) == destination)
