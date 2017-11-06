@@ -126,7 +126,7 @@ int main() {
 		ProcessMoveRequest();
 		isPlayerOne = !isPlayerOne;
 		// cin.get();
-		// cout << "Current Board Heuristic: " << Heuristic(board) << endl;
+		cout << "Current Board Heuristic: " << Heuristic(board) << endl;
 	}
 
 	// Post Game Display
