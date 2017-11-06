@@ -12,7 +12,6 @@ public:
 
 	static bool adjacent(int, int, std::map<int, std::vector<int>>);
 	static bool destinationCheck(int, int, char* board, std::map<int, std::vector<int>>);
-	static void tokenCountUpdate(int&, int&, bool);
 	static void attacking(Move, char*, std::map<int, std::vector<int>>);
 	static vector<int> checkPossibleMoves(int, char*, std::map<int, std::vector<int>>);
 	static vector<Move> getAllMoves(char*, bool, std::map<int, std::vector<int>>);

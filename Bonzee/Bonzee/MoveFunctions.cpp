@@ -57,14 +57,6 @@ bool MoveFunctions::destinationCheck(int position, int destination, char* board,
 		return MoveFunctions::adjacent(position, destination, adjacentCells);
 }
 
-void MoveFunctions::tokenCountUpdate(int& greenCounter, int& redCounter, bool isPlayerOne)
-{
-	if (isPlayerOne)
-		redCounter--;    // Decrement red token count
-	else
-		greenCounter --;  // Decrement green token count
-}
-
 void MoveFunctions::attacking(Move inputMove, char* currentBoard, std::map<int, std::vector<int>> adjacentCells)
 {
 

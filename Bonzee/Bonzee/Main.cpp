@@ -3,10 +3,6 @@
 #include "MoveFunctions.h"
 #include "HeuristicFunctions.h"
 
-// Counters
-static int greenCounter = MAX_PIECES_NUM;
-static int redCounter   = MAX_PIECES_NUM;
-
 // Booleans
 static bool isPlayerOne = true;
 static bool singlePlayer = true;
@@ -52,16 +48,12 @@ std::map<int, std::vector<int> > adjacentCells;
 //	'G', 'G', 'G', 'G', ' ', 'R', 'R', 'R', ' ',
 //	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',
 //	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
-	
-// redCounter = 3; // REMEMBER TO CHANGE RED COUNTER TO 3
 
 // -- Function definitions
 void ProcessMoveRequest();
 bool destinationCheck(int, int);
 void attacking(Move, char*);
 bool adjacent(int, int);
-void tokenCountUpdate();
-int Heuristic(char*);
 vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
 int maxSearch(int, char*, bool);
@@ -84,7 +76,7 @@ int main() {
 		ProcessMoveRequest();
 		isPlayerOne = !isPlayerOne;
 		// cin.get();
-		cout << "Current Board Heuristic: " << Heuristic(board) << endl;
+		cout << "Current Board Heuristic: " << HeuristicFunctions::Heuristic(board) << endl;
 	}
 
 	// Post Game Display
@@ -283,7 +275,6 @@ void ProcessMoveRequest() {
 						attacking(userMove, board);
 
 						completedTurn = true;
-						// cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
 					}
 
 					else
@@ -419,7 +410,7 @@ int minSearch(int depth, char* board, bool player) {
 
 	// Base case
 	if (depth == 0 || getAllMoves(board, player).empty()) {
-		return Heuristic(board);
+		return HeuristicFunctions::Heuristic(board);
 	}
 	else {
 		vector<Move> allMoves = getAllMoves(board, player);
@@ -444,7 +435,7 @@ int minSearch(int depth, char* board, bool player) {
 // Maximize the win condition (Recursion)
 int maxSearch(int depth, char* board, bool player) {
 	if (depth == 0 || getAllMoves(board, player).empty()) {
-		return Heuristic(board);
+		return HeuristicFunctions::Heuristic(board);
 	}
 	else {
 		vector<Move> allMoves = getAllMoves(board, player);
@@ -497,45 +488,6 @@ void attacking(Move inputMove, char* currentBoard) {
 			currentBoard[target] = ' ';
 			tempPosition = target;
 			target += direction;
-			//tokenCountUpdate();
 		}
 	}
-}
-
-// Decrements token count depending on player's turn
-void tokenCountUpdate() {
-	if (isPlayerOne) 
-		redCounter--;    // Decrement red token count
-	else 
-		greenCounter--;  // Decrement green token count
-}
-
-int Heuristic(char* tempBoard) {
-	/*
-	THE NAIVE HEURISTIC IS:
-	e(board) = 
-		100 x (SUM[1 to # green tokens left](horizontal index for the current green token visited))
-		+ 50 x (SUM[1 to # green tokens left](vertical index for the current green token visited))
-		- 100 x (SUM[1 to # red tokens left](horizontal index for the current red token visited))
-		- 50 x (SUM[1 to # red tokens left](vertical index for the current red token visited))
-	*/
-
-	// Vertical/Horizontal Indexes values for each color
-	int verticalGreenVal = 0, verticalRedVal = 0, horizontalGreenVal = 0, horizontalRedVal = 0;
-
-	for (int i = 0; i < MAX_BOARD_SIZE; i++){
-		if (tempBoard[i] == 'G'){
-			/*visitedGreen--;*/
-			verticalGreenVal += HeuristicFunctions::getColumnIndex(i);
-			horizontalGreenVal += HeuristicFunctions::getRowIndex(i);
-		}
-		if (tempBoard[i] == 'R'){
-			//visitedRed--;
-			verticalRedVal += HeuristicFunctions::getColumnIndex(i);
-			horizontalRedVal += HeuristicFunctions::getRowIndex(i);
-		}
-	}
-	
-	// Return the heuristic value
-	return (HEURISTIC_MULTIPLIER_100 * horizontalGreenVal) + (HEURISTIC_MULTIPLIER_50 * verticalGreenVal) - (HEURISTIC_MULTIPLIER_100 * horizontalRedVal) - (HEURISTIC_MULTIPLIER_50 * verticalRedVal);
 }
