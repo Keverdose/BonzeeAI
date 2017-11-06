@@ -51,7 +51,6 @@ std::map<int, std::vector<int> > adjacentCells;
 
 // -- Function definitions
 void ProcessMoveRequest();
-Move getAiMove(int, char*, bool);
 
 int main() {
 
@@ -91,7 +90,7 @@ void ProcessMoveRequest() {
 			clock_t start = clock();
 
 			// Get the best move from the ai (Via recursion)
-			Move aiMove = getAiMove(DEPTH, board, aiTurn);
+			Move aiMove = HeuristicFunctions::getAiMove(DEPTH, board, aiTurn, adjacentCells);
 
 			// Display and Input the AI move
 			cout << "The ai chooses: " << HeuristicFunctions::indexToBoard(aiMove.start) << " " << HeuristicFunctions::indexToBoard(aiMove.destination) << endl;
@@ -161,59 +160,4 @@ void ProcessMoveRequest() {
 
 		}
 	} while (!completedTurn);
-}
-
-// Implements minimax, and returns the best move the ai should take accordingly. 
-Move getAiMove(int depth, char* board, bool playerMax) {
-
-	vector<Move> allMoves = MoveFunctions::getAllMoves(board, playerMax, adjacentCells);
-	Move aiMove;
-
-	// Make new temp board and copy everything from previous board
-	char tempBoard[MAX_BOARD_SIZE];
-	for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-		tempBoard[k] = board[k];
-	}
-
-	// If AI is Maximizing (Max - Green Token)
-	if (playerMax) {
-		int highestValue = - 9999999;
-		for (int i = 0; i < allMoves.size(); i++) {
-			// Get Fresh copy of previous board
-			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-				tempBoard[k] = board[k];
-			}
-			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells); // Perform attack on each valid move
-			int value = HeuristicFunctions::maxSearch(depth - 1, tempBoard, !playerMax, adjacentCells); // Value contains the best heuristic value 
-
-			if (value > highestValue) {
-				cout << "Move updated because last move's heuristic: " << highestValue << ", and current new move's heuristic: " << value << endl;
-				highestValue = value;
-				aiMove = allMoves[i];
-			}
-		}
-	}
-
-	// If AI is Minimizing (Min - Red Token)
-	else if (!playerMax) {
-		int lowestValue = 9999999;
-
-		for (int i = 0; i < allMoves.size(); i++) {
-			// Get Fresh copy of the board
-			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-				tempBoard[k] = board[k];
-			}
-
-			MoveFunctions::attacking(allMoves[i], tempBoard, adjacentCells);	// Perform attack on each valid move
-			int value = HeuristicFunctions::minSearch(depth - 1, tempBoard, !playerMax, adjacentCells); // Value contains the best heuristic value 
-
-			if (value < lowestValue) {
-				cout << "Move updated because last move's heuristic: " << lowestValue << ", and current new move's heuristic: " << value << endl;
-				lowestValue = value;
-				aiMove = allMoves[i];
-			}
-		}
-	}
-
-	return aiMove; // Returns the ai's move.
 }
