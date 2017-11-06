@@ -51,7 +51,6 @@ std::map<int, std::vector<int> > adjacentCells;
 
 // -- Function definitions
 void ProcessMoveRequest();
-bool destinationCheck(int, int);
 void attacking(Move, char*);
 vector<Move> getAllMoves(char *tempBoard, bool player);
 int minSearch(int, char*, bool);
@@ -158,7 +157,7 @@ void ProcessMoveRequest() {
 
 
 					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-					if (BoardFunctions::isValid(isPlayerOne, board[choIndex]) && destinationCheck(choIndex, destIndex)) {
+					if (BoardFunctions::isValid(isPlayerOne, board[choIndex]) && MoveFunctions::destinationCheck(choIndex, destIndex, board, adjacentCells)) {
 
 						Move userMove;
 						userMove.start = choIndex;
@@ -179,19 +178,6 @@ void ProcessMoveRequest() {
 
 		}
 	} while (!completedTurn);
-}
-
-
-// Checks whether it is a valid destination 
-bool destinationCheck(int position, int destination) {
-
-	// If cell occupied, return false;
-	if (board[destination] != ' ') 
-		return false; 
-
-	//Else check if the cell is adjacent to position.
-	else 
-		return MoveFunctions::adjacent(position, destination, adjacentCells);
 }
 
 // Loops through the array to add all possible move given the player's token into a vector.

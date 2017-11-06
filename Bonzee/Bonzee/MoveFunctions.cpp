@@ -45,7 +45,7 @@ bool MoveFunctions::adjacent(int position, int destination, std::map<int, std::v
 	return false;
 }
 
-bool MoveFunctions::destinationCheck(int position, int destination, char* board, std::map<int, std::vector<int>> adjacentCells)
+bool MoveFunctions::destinationCheck(int position, int destination, char* board, std::map<int, std::vector<int>>& adjacentCells)
 {
 
 	// If cell occupied, return false;
