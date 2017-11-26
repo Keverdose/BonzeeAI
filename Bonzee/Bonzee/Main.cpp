@@ -73,11 +73,11 @@ char board[MAX_BOARD_SIZE] = {
 std::map<int, std::vector<int> > adjacentCells;
 
 //char board[MAX_BOARD_SIZE] = {
-//	'R', 'R', 'R', 'R', ' ', 'R', ' ', 'R', ' ',
-//	'R', 'R', 'R', ' ', 'R', 'R', 'R', 'R', ' ',
-//	' ', ' ', ' ', ' ', 'R', ' ', 'G', ' ', 'G',
-//	'G', 'G', 'G', ' ', 'G', 'G', 'G', ' ', ' ',
-//	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', ' ' };
+//	' ', ' ', ' ', 'R', 'R', ' ', ' ', 'R', ' ',
+//	'R', 'R', 'R', ' ', ' ', ' ', ' ', ' ', ' ',
+//	'G', ' ', ' ', ' ', ' ', 'G', 'G', 'R', ' ',
+//	' ', 'G', ' ', ' ', 'R', ' ', ' ', 'G', ' ',
+//	'G', 'G', 'G', 'G', ' ', 'G', ' ', 'G', ' ' };
 
 // Board setting to win in one move
 //char board[MAX_BOARD_SIZE] = {
