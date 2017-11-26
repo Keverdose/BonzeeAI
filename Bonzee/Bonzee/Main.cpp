@@ -526,7 +526,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 			}
 			attacking(allMoves[i], tempBoard); // Perform attack on each valid move
 			int value = alphaBetaPruning(depth - 1, tempBoard, -9999999, 9999999, !playerMax);
-			//int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+			//int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
 
 			if (value > highestValue) {
 				cout << "Move updated because last move's heuristic: " << highestValue << ", and current new move's heuristic: " << value << endl;
@@ -548,7 +548,7 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 
 			attacking(allMoves[i], tempBoard);	// Perform attack on each valid move
 			int value = alphaBetaPruning(depth - 1, tempBoard, -9999999, 9999999, !playerMax);
-			//int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+			//int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
 
 			if (value < lowestValue) {
 				cout << "Move updated because last move's heuristic: " << lowestValue << ", and current new move's heuristic: " << value << endl;
