@@ -28,7 +28,7 @@ static const int HEURISTIC_MULTIPLIER_100 = 100;
 static const int HEURISTIC_MULTIPLIER_50 = 50;
 
 // Level of recursion
-static const int depth = 4; 
+static const int depth = 3; 
 
 // Counters
 //static int greenCounter = MAX_PIECES_NUM;
@@ -110,6 +110,7 @@ int maxSearch(int, char*, bool);
 Move getAiMove(int, char*, bool);
 void generateMap(int, int, int);
 void singleOrMultiplayer();
+int alphaBetaPruning(int, char*, int, int, bool);
 
 
 int main() {
@@ -524,7 +525,8 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 				tempBoard[k] = board[k];
 			}
 			attacking(allMoves[i], tempBoard); // Perform attack on each valid move
-			int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+			int value = alphaBetaPruning(depth - 1, tempBoard, -9999999, 9999999, !playerMax);
+			//int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
 
 			if (value > highestValue) {
 				cout << "Move updated because last move's heuristic: " << highestValue << ", and current new move's heuristic: " << value << endl;
@@ -545,7 +547,8 @@ Move getAiMove(int depth, char* board, bool playerMax) {
 			}
 
 			attacking(allMoves[i], tempBoard);	// Perform attack on each valid move
-			int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+			int value = alphaBetaPruning(depth - 1, tempBoard, -9999999, 9999999, !playerMax);
+			//int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
 
 			if (value < lowestValue) {
 				cout << "Move updated because last move's heuristic: " << lowestValue << ", and current new move's heuristic: " << value << endl;
@@ -585,6 +588,7 @@ int minSearch(int depth, char* board, bool player) {
 
 }
 
+
 // Maximize the win condition (Recursion)
 int maxSearch(int depth, char* board, bool player) {
 	if (depth == 0 || getAllMoves(board, player).empty()) {
@@ -606,6 +610,51 @@ int maxSearch(int depth, char* board, bool player) {
 			}
 		}
 		return maxValue;
+	}
+}
+
+// Alpha beta pruning algorithm implemented
+int alphaBetaPruning(int depth, char* board, int alpha, int beta, bool player) {
+	if (depth <= 0 || getAllMoves(board, player).empty()) {
+		return Heuristic(board);
+	}
+	vector<Move> allMoves = getAllMoves(board, player);
+	char tempBoard[MAX_BOARD_SIZE];
+	if (player) {
+		int maxValue = -9999999;
+		// For every move possible, go check.
+		for (int i = 0; i < allMoves.size(); i++) {
+			// Creates a copy of the board, so we dont lose our current board
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
+			// Process the Ai's move to get the node
+			attacking(allMoves[i], tempBoard);
+			maxValue = std::max(maxValue, alphaBetaPruning(depth - 1, tempBoard, alpha, beta, !player));
+			alpha = std::max(alpha, maxValue);
+			if (beta <= alpha) {
+				break;
+			}
+		}
+		return maxValue;
+	}
+	else {
+		int minValue = 9999999;
+		// For every move possible, go check.
+		for (int i = 0; i < allMoves.size(); i++) {
+			// Creates a copy of the board, so we dont lose our current board
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
+			// Process the Ai's move to get the node
+			attacking(allMoves[i], tempBoard);
+			minValue = std::min(minValue, alphaBetaPruning(depth - 1, tempBoard, alpha, beta, !player));
+			beta = std::min(beta, minValue);
+			if (beta <= alpha) {
+				break;
+			}
+		}
+		return minValue;
 	}
 }
 
