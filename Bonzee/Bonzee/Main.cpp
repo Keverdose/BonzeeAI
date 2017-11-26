@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <vector>
 
+#include <ctime>
+
 // -- Namespaces
 using std::cout;
 using std::endl;
@@ -20,6 +22,10 @@ static const int ROW_LENGTH     = 9;
 static const int COLUMN_LENGTH  = 5;
 static const int MAX_PIECES_NUM = 22;
 static const int ASCII_LETTER_OFFSET = 48;
+static const int HEURISTIC_MULTIPLIER_100 = 100;
+static const int HEURISTIC_MULTIPLIER_50 = 50;
+
+static const int depth = 4; // Level of recursion
 
 static int greenCounter = MAX_PIECES_NUM;
 static int redCounter   = MAX_PIECES_NUM;
@@ -57,11 +63,11 @@ char board[MAX_BOARD_SIZE] = {
 	'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G' };
 
 //char board[MAX_BOARD_SIZE] = {
-//	'R', 'R', 'R', 'R', ' ', 'R', ' ', 'R', ' ',
-//	'R', 'R', 'R', ' ', 'R', 'R', 'R', 'R', ' ',
-//	' ', ' ', ' ', ' ', 'R', ' ', 'G', ' ', 'G',
-//	'G', 'G', 'G', ' ', 'G', 'G', 'G', ' ', ' ',
-//	'G', 'G', 'G', ' ', 'G', 'G', 'G', 'G', ' ' };
+//	' ', ' ', ' ', 'R', 'R', ' ', ' ', 'R', ' ',
+//	'R', 'R', 'R', ' ', ' ', ' ', ' ', ' ', ' ',
+//	'G', ' ', ' ', ' ', ' ', 'G', 'G', 'R', ' ',
+//	' ', 'G', ' ', ' ', 'R', ' ', ' ', 'G', ' ',
+//	'G', 'G', 'G', 'G', ' ', 'G', ' ', 'G', ' ' };
 
 std::map<int, std::vector<int> > adjacentCells;
 
@@ -78,7 +84,6 @@ std::map<int, std::vector<int> > adjacentCells;
 // -- Function definitions
 void PrintBoard();
 void ProcessMoveRequest();
-bool availableSpace(int);
 bool isValid(char);
 bool IsValidChoice(string);
 bool destinationCheck(int, int);
@@ -106,25 +111,6 @@ int main() {
 		generateMap(i, MAX_BOARD_SIZE, ROW_LENGTH);
 	}
 
-	//// Print out map
-	//for (int j = 0; j < MAX_BOARD_SIZE; j++) {
-
-	//	cout << "Map[" << j << "] = ( ";
-
-	//	for (int k = 0; k < adjacentCells[j].size(); k++) {
-	//		cout << adjacentCells[j].at(k) << " ";
-	//	}
-
-	//	cout << ") " << endl;
-	//}
-
-
-	//std::vector<int> positions = checkPossibleMoves(23, board);
-
-	//for (int o = 0; o < positions.size(); o++) {
-	//	cout << "Possible Moves: " << positions.at(o) << endl;
-	//}
-
 	singleOrMultiplayer();
 	while (!winningBoard(board)) {
 		
@@ -132,10 +118,11 @@ int main() {
 		ProcessMoveRequest();
 		isPlayerOne = !isPlayerOne;
 		// cin.get();
-		cout << Heuristic(board);
+		// cout << "Current Board Heuristic: " << Heuristic(board) << endl;
 	}
 
 	// Post Game Display
+	PrintBoard();
 	cout << "Game is over!" << endl;
 
 	cin.get();
@@ -147,36 +134,32 @@ void generateMap(int index, int boardSize, int row_length) {
 	// Insert a new entry into the Map
 	adjacentCells.insert(std::pair<int, std::vector<int> >(index, std::vector<int>()));
 
-	// Check Left Bound
+	// ============ Check Left Bound ============ 
 	if (index % row_length != 0) {
 
-		// Add Upper Left Diagonal Index
+		// -- Add Upper Left Diagonal Index
 		if ((index > row_length) && (index % 2 == 0)) {
 			adjacentCells[index].push_back(index - (row_length + 1));
 		}
-
-		// Add Lower Left Diagonal Index
+		// -- Add Lower Left Diagonal Index
 		if ((index < (boardSize - row_length)) && (index % 2 == 0)) {
 			adjacentCells[index].push_back(index + (row_length - 1));
 		}
-
 		// Add Left Index
 		 adjacentCells[index].push_back(index - 1);
 	}
 
-	// Check Right Bound
+	// ============ Check Right Bound ============  
 	if ((index % (row_length)) != (row_length - 1)) {
 
-		// Add Upper Right Diagonal Index
+		// -- Add Upper Right Diagonal Index
 		if ((index > (row_length - 1)) && (index % 2 == 0)) {
 			adjacentCells[index].push_back((index - row_length) + 1);
 		}
-
-		// Add Lower Right Diagonal Index
+		// -- Add Lower Right Diagonal Index
 		if ((index < boardSize - row_length) && (index % 2 == 0)) {
 			adjacentCells[index].push_back(index + (row_length + 1));
 		}
-
 		// Add Right Index
 		adjacentCells[index].push_back(index + 1);
 	}
@@ -184,55 +167,9 @@ void generateMap(int index, int boardSize, int row_length) {
 	// Add Top Index
 	if (index > (row_length - 1) )
 		adjacentCells[index].push_back(index - row_length);
-
 	// Add Bottom Index
 	if (index < (boardSize - row_length))
 		adjacentCells[index].push_back(index + row_length);
-
-}
-
-// Method to decide whether it's multiplayer or single player
-void singleOrMultiplayer() {
-	bool modeChosen = false;
-	do {
-		cout << "Would you like to play singleplayer or multiplayer (s/m): ";
-		string answer = "";
-		getline(cin, answer);
-		transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
-		if (answer.length() > 1) {
-			cout << "Invalid choice, please try again: ";
-		}
-		else {
-			// If user chooses singleplayer mode, make him choose the AI's Token.
-			if (answer.at(0) == 'S') {
-				bool aiTokenChosen = false;
-				do {
-					cout << "Singleplayer mode chosen. You will play against a minimax A.I.; \nWhich token will the A.I. play? (R/G): ";
-					string aiChoice = "";
-					getline(cin, aiChoice);
-					transform(aiChoice.begin(), aiChoice.end(), aiChoice.begin(), ::toupper);
-					if (aiChoice.length() > 1 || (aiChoice.at(0) != 'R' && aiChoice.at(0) != 'G')) {
-						cout << "Invalid token, please try again: ";
-					}
-					else {
-						if (aiChoice.at(0) == 'R') {
-							aiTurn = false;
-						}
-						else {
-							aiTurn = true;
-						}
-						aiTokenChosen = true;
-					}
-				} while (!aiTokenChosen);
-			}
-			// If user chooses multiplayer mode, exit normally
-			if (answer.at(0) == 'M') {
-				cout << "Multiplayer mode chosen." << endl;
-				singlePlayer = false;
-			}
-			modeChosen = true;
-		}
-	} while (!modeChosen);
 }
 
 // Check the possible moves at given index
@@ -248,10 +185,68 @@ std::vector<int> checkPossibleMoves(int index, char* updatedBoard) {
 	return moves;
 }
 
+// Method to decide whether it's multiplayer or single player
+void singleOrMultiplayer() {
+
+	bool modeChosen = false;
+
+	do {
+		// Ask and process input
+		cout << "Would you like to play singleplayer (vs AI) or multiplayer (vs Human) (S/M): ";
+		string answer = "";
+		getline(cin, answer);
+		transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
+
+		// Input Check
+		if (answer.length() != 1 ) {
+			cout << "Invalid choice, please try again: ";
+		}
+
+		else {
+			// If user chooses singleplayer mode, make him choose the AI's Token.
+			if (answer.at(0) == 'S') {
+
+				bool aiTokenChosen = false;
+				
+				do {
+					// Ask and process input
+					cout << "> Singleplayer mode chosen. \n> You will play against a minimax A.I. \n\nWhich token will the A.I. play? (R/G): ";
+					string aiChoice = "";
+					getline(cin, aiChoice);
+					transform(aiChoice.begin(), aiChoice.end(), aiChoice.begin(), ::toupper);
+					
+					// Input Check
+					if (aiChoice.length() != 1 || (aiChoice.at(0) != 'R' && aiChoice.at(0) != 'G')) {
+						cout << "Invalid token, please try again: ";
+					}
+
+					else {
+						// AI is Red Token, starts 2nd
+						if (aiChoice.at(0) == 'R') {
+							aiTurn = false;
+						}
+						// AI is Green Token, starts 1st
+						else {
+							aiTurn = true;
+						}
+						aiTokenChosen = true;
+					}
+				} while (!aiTokenChosen);
+			}
+
+			// If user chooses multiplayer mode, exit normally
+			if (answer.at(0) == 'M') {
+				cout << "Multiplayer mode chosen." << endl;
+				singlePlayer = false;
+			}
+			modeChosen = true;
+		}
+	} while (!modeChosen);
+}
+
 
 // Function to Print Current Board Configuration
 void PrintBoard() {
-	cout << "\n\nBlack Cells Denoted By: [ ]\nWhite Cells Denoted By: ( )";
 	cout << "\n\n ======================== B O N Z E E ======================= " << endl;
 	cout << "\n       1     2     3     4     5     6     7     8     9";
 
@@ -271,11 +266,12 @@ void PrintBoard() {
 			cout << " ( " << board[i] << " )";  // White Square	
 	}
 
-	cout << "\n\n ============================================================\n" << endl;
+	cout << "\n\n  Black Cells Denoted By: [ ] - White Cells Denoted By: ( )";
+	cout << "\n ============================================================\n" << endl;
 
 }
 
-
+// Proceed the move input
 void ProcessMoveRequest() {
 
 	bool completedTurn = false;
@@ -284,12 +280,25 @@ void ProcessMoveRequest() {
 	do {
 		// Check if current turn is ai's turn, and it's in singleplayer mode
 		if (isPlayerOne == aiTurn && singlePlayer) {
-			//Get the best move from the ai
-			Move aiMove = getAiMove(3, board, aiTurn);
+
+			// Start Timer before AI checks for best move
+			clock_t start = clock();
+
+			// Get the best move from the ai (Via recursion)
+			Move aiMove = getAiMove(depth, board, aiTurn);
+
+			// Display and Input the AI move
 			cout << "The ai chooses: " << indexToBoard(aiMove.start) << " " << indexToBoard(aiMove.destination) << endl;
 			attacking(aiMove, board);
+
+			// End Timer after AI inputted best move
+			clock_t end = clock();
+			double elapsedTime = double(end - start) / CLOCKS_PER_SEC;
+			cout << "Elapsed time: " << elapsedTime << " seconds " << endl;
+
 			completedTurn = true;
 		}
+
 		// else let the player play
 		else {
 			if (isPlayerOne)
@@ -304,9 +313,9 @@ void ProcessMoveRequest() {
 			if (answer.length() != 5)
 				cout << "Invalid String given, please try again." << endl;
 
+
 			else if (answer.at(2) != ' ')
 				cout << "Invalid String given, please try again." << endl;
-
 
 			// Process Input
 			else {
@@ -315,7 +324,7 @@ void ProcessMoveRequest() {
 				string choice = { answer.at(0), answer.at(1) };
 				string destination = { answer.at(3), answer.at(4) };
 
-				cout << "\nBoard Update: " << endl;
+				cout << "\nPlayer Input: " << endl;
 				cout << "  Position: " << choice << "; Destination: " << destination << endl;
 
 				// Checks if the two coordinates are within the array, if so then continue. else, prompt again
@@ -323,17 +332,19 @@ void ProcessMoveRequest() {
 					choIndex = BoardToIndex(choice);
 					destIndex = BoardToIndex(destination);
 
+
 					// Checks if selected token is valid, if there's available move for choindex, and if the destination is valid.
-					if (isValid(board[choIndex]) && availableSpace(choIndex) && destinationCheck(choIndex, destIndex)) {
+					if (isValid(board[choIndex]) && destinationCheck(choIndex, destIndex)) {
 
 						Move userMove;
 						userMove.start = choIndex;
 						userMove.destination = destIndex;
+
 						// Execute Attack Algorithm
 						attacking(userMove, board);
 
 						completedTurn = true;
-						cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
+						// cout << "  Red: " << redCounter << ", Green: " << greenCounter << endl;
 					}
 
 					else
@@ -342,85 +353,9 @@ void ProcessMoveRequest() {
 				else
 					cout << "Invalid positions, please try again." << endl;
 			}
+
 		}
-
-		// PrintBoard();
-
 	} while (!completedTurn);
-}
-
-
-// Function that returns boolean to check whether the selected token has an available move
-bool availableSpace(int currentPosition) {
-
-	// If the current position is out of bound
-	if (currentPosition < EMPTY_BOARD || currentPosition > (MAX_BOARD_SIZE - 1)) 
-		return false;
-
-		
-	// Checks downwards
-	if (currentPosition + ROW_LENGTH < MAX_BOARD_SIZE) {
-		if (board[currentPosition + ROW_LENGTH] == ' ') {
-			return true;
-		}
-	}
-		
-	// Checks upwards
-	if (currentPosition - ROW_LENGTH > -1) {
-		if (board[currentPosition - ROW_LENGTH] == ' ') {
-			return true;
-		}
-	}
-		
-	// Checks right (Makes sure the rightmost column can't go right)
-	if ((currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-		if (board[currentPosition + 1] == ' ') {
-			return true;
-		}
-	}
-		
-	// Checks left (Makes sure the leftmost column can't go left)
-	if ((currentPosition % ROW_LENGTH) != 0) {
-		if (board[currentPosition - 1] == ' ') {
-			return true;
-		}
-	}
-		
-
-	// IF CELL IS BLACK (DIAGONAL CHECKS)
-	if (currentPosition % 2 == 0) {
-
-		// Checks topleft
-		if (currentPosition - (ROW_LENGTH + 1) > 0 && (currentPosition % ROW_LENGTH) != 0) {
-			if (board[currentPosition - (ROW_LENGTH + 1)] == ' ') {
-				return true;
-			}
-		}
-			
-		// Checks topright
-		if (currentPosition - (ROW_LENGTH - 1) > 0 && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition - (ROW_LENGTH - 1)] == ' ') {
-				return true;
-			}
-		}
-			
-		// Checks bottomleft
-		if ((currentPosition % ROW_LENGTH) != 0 && (currentPosition + (ROW_LENGTH - 1) < MAX_BOARD_SIZE)) {
-			if (board[currentPosition + (ROW_LENGTH - 1)] == ' ') {
-				return true;
-			}
-		}
-			
-		// Checks bottomright
-		if ((currentPosition + (ROW_LENGTH + 1) < MAX_BOARD_SIZE) && (currentPosition % ROW_LENGTH + 1) != ROW_LENGTH) {
-			if (board[currentPosition + (ROW_LENGTH + 1)] == ' ') {
-				return true;
-			}
-		}
-
-	}
-
-	return false;
 }
 
 
@@ -437,50 +372,15 @@ bool destinationCheck(int position, int destination) {
 }
 
 
-// Method to check adjacency of positions
+// New Adjacent Function that looks up the map for adjacent cells
 bool adjacent(int position, int destination) {
 
-	// Have to make sure that the 1st column and last column cant go left or right
-	if (position % 2 == 0) {
-		if (position % ROW_LENGTH == 0)
-			return(position + 1 == destination
-				|| position + (ROW_LENGTH + 1) == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination
-				|| position - (ROW_LENGTH - 1) == destination);
-
-		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
-			return(position - 1 == destination
-				|| position - (ROW_LENGTH + 1) == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination
-				|| position + (ROW_LENGTH - 1) == destination);
-
-		return(position + 1 == destination
-			|| position - 1 == destination
-			|| position - (ROW_LENGTH + 1) == destination
-			|| position + (ROW_LENGTH + 1) == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination
-			|| position - (ROW_LENGTH - 1) == destination
-			|| position + (ROW_LENGTH - 1) == destination);
+	for (int i = 0; i < adjacentCells[position].size(); i++) {
+		if (adjacentCells[position].at(i) == destination)
+			return true;
 	}
-	else {
-		if (position % ROW_LENGTH == 0)
-			return(position + 1 == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination);
 
-		else if (position % ROW_LENGTH == (ROW_LENGTH - 1))
-			return(position - 1 == destination
-				|| position - ROW_LENGTH == destination
-				|| position + ROW_LENGTH == destination);
-
-		return(position + 1 == destination
-			|| position - 1 == destination
-			|| position - ROW_LENGTH == destination
-			|| position + ROW_LENGTH == destination);
-	}
+	return false;
 }
 
 
@@ -560,23 +460,32 @@ string indexToBoard(int index) {
 
 // Loops through the array to add all possible move given the player's token into a vector.
 vector<Move> getAllMoves(char *tempBoard, bool player){
+
 	char token;
 	vector<Move> allMoves;
+
+	// Define the token color based on player's turn
 	if (player) {
 		token = 'G';
 	}
 	else {
 		token = 'R';
 	}
+
 	if (!winningBoard(tempBoard)) {
+		// Loops through array to check if the token is the current player
 		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
-			// Loops through array to check if the token is the current player
 			if (tempBoard[i] == token) {
+
 				// Checks all adjacents
 				Move temp;
-				temp.start = i;
+				temp.start = i;	// Setting the starting point of Move 
+
+				// Check all possible valid moves that AI can make on this specific board configuration
 				vector<int> possibleMovesDestination = checkPossibleMoves(i, tempBoard);
-				for (int j = 0; j < possibleMovesDestination.size(); j++ ) { // Loops through all available adjacents
+
+				// Loops through all available adjacents and stores all valid moves
+				for (int j = 0; j < possibleMovesDestination.size(); j++ ) { 
 					temp.destination = possibleMovesDestination[j];
 					allMoves.push_back(temp);
 				}
@@ -586,42 +495,65 @@ vector<Move> getAllMoves(char *tempBoard, bool player){
 	return allMoves;
 }
 
-// Implements minimax, and returns the best move the ai should take according. 
+// Implements minimax, and returns the best move the ai should take accordingly. 
 Move getAiMove(int depth, char* board, bool playerMax) {
+
 	vector<Move> allMoves = getAllMoves(board, playerMax);
-	char tempBoard[MAX_BOARD_SIZE];
 	Move aiMove;
+
+	// Make new temp board and copy everything from previous board
+	char tempBoard[MAX_BOARD_SIZE];
 	for (int k = 0; k < MAX_BOARD_SIZE; k++) {
 		tempBoard[k] = board[k];
 	}
+
+	// If AI is Maximizing (Max - Green Token)
 	if (playerMax) {
 		int highestValue = - 9999999;
 		for (int i = 0; i < allMoves.size(); i++) {
-			attacking(allMoves[i], tempBoard);
-			int value = maxSearch(depth - 1, tempBoard, !playerMax);
+			// Get Fresh copy of previous board
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
+			attacking(allMoves[i], tempBoard); // Perform attack on each valid move
+			int value = maxSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+
 			if (value > highestValue) {
+				cout << "Move updated because last move's heuristic: " << highestValue << ", and current new move's heuristic: " << value << endl;
 				highestValue = value;
 				aiMove = allMoves[i];
 			}
-
 		}
 	}
+
+	// If AI is Minimizing (Min - Red Token)
 	else if (!playerMax) {
 		int lowestValue = 9999999;
+
 		for (int i = 0; i < allMoves.size(); i++) {
-			attacking(allMoves[i], tempBoard);
-			int value = minSearch(depth - 1, tempBoard, !playerMax);
+			// Get Fresh copy of the board
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
+
+			attacking(allMoves[i], tempBoard);	// Perform attack on each valid move
+			int value = minSearch(depth - 1, tempBoard, !playerMax); // Value contains the best heuristic value 
+
 			if (value < lowestValue) {
+				cout << "Move updated because last move's heuristic: " << lowestValue << ", and current new move's heuristic: " << value << endl;
 				lowestValue = value;
 				aiMove = allMoves[i];
 			}
 		}
 	}
-	return aiMove; //Returns the ai's move.
+
+	return aiMove; // Returns the ai's move.
 }
 
 // Minimize the win condition (Recursion)
 int minSearch(int depth, char* board, bool player) {
+
+	// Base case
 	if (depth == 0 || getAllMoves(board, player).empty()) {
 		return Heuristic(board);
 	}
@@ -629,11 +561,11 @@ int minSearch(int depth, char* board, bool player) {
 		vector<Move> allMoves = getAllMoves(board, player);
 		char tempBoard[MAX_BOARD_SIZE];
 		int minValue = 999999999;
-		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-			tempBoard[k] = board[k];
-		}
 		for (int i = 0; i < allMoves.size(); i++) {
 			int comparedValue;
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
 			attacking(allMoves[i], tempBoard);
 			comparedValue = maxSearch(depth - 1, tempBoard, !player); 
 			if (comparedValue < minValue) {
@@ -654,10 +586,10 @@ int maxSearch(int depth, char* board, bool player) {
 		vector<Move> allMoves = getAllMoves(board, player);
 		char tempBoard[MAX_BOARD_SIZE];
 		int maxValue = -9999999;
-		for (int k = 0; k < MAX_BOARD_SIZE; k++) {
-			tempBoard[k] = board[k];
-		}
 		for (int i = 0; i < allMoves.size(); i++) {
+			for (int k = 0; k < MAX_BOARD_SIZE; k++) {
+				tempBoard[k] = board[k];
+			}
 			attacking(allMoves[i], tempBoard);
 			int comparedValue;
 			comparedValue = minSearch(depth - 1, tempBoard, !player);
@@ -680,6 +612,9 @@ bool winningBoard(char* board) {
 		else if (board[i] == 'R') {
 			rcounter++;
 		}
+
+		if (gcounter > 0 && rcounter > 0)
+			return false;
 	}
 	return (gcounter == 0 || rcounter == 0);
 }
@@ -729,7 +664,7 @@ void tokenCountUpdate() {
 		greenCounter--;  // Decrement green token count
 }
 
-int Heuristic(char* tempBoard){
+int Heuristic(char* tempBoard) {
 	/*
 	THE NAIVE HEURISTIC IS:
 	e(board) = 
@@ -756,13 +691,13 @@ int Heuristic(char* tempBoard){
 	}
 	
 	// Return the heuristic value
-	return (100 * horizontalGreenVal) + (50 * verticalGreenVal) - (100 * horizontalRedVal) - (50 * verticalRedVal);
+	return (HEURISTIC_MULTIPLIER_100 * horizontalGreenVal) + (HEURISTIC_MULTIPLIER_50 * verticalGreenVal) - (HEURISTIC_MULTIPLIER_100 * horizontalRedVal) - (HEURISTIC_MULTIPLIER_50 * verticalRedVal);
 }
 
 // Takes in a board index and returns its row index # (i.e. 27 returns 4 since D = 4)
 // TODO make this into a struct to return both row and column index
 int getRowIndex(int index){
-	float val = index / 9;
+	float val = index / ROW_LENGTH;
 	
 	// A = 1, B = 2, C = 3, D = 4, E = 5
 	if (val < 0 || val > 5) {
@@ -775,6 +710,6 @@ int getRowIndex(int index){
 
 // Takes in a board index and returns its column index # (i.e. 27 returns 1 because it's in the 1st column)
 int getColumnIndex(int index){
-	return (index % 9) + 1;
+	return (index % ROW_LENGTH) + 1;
 }
 
