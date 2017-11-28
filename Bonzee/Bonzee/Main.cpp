@@ -466,7 +466,6 @@ string indexToBoard(int index) {
 	return temp;
 }
 
-
 // Loops through the array to add all possible move given the player's token into a vector.
 vector<Move> getAllMoves(char *tempBoard, bool player){
 
@@ -729,25 +728,81 @@ int Heuristic(char* tempBoard) {
 		- 100 x (SUM[1 to # red tokens left](horizontal index for the current red token visited))
 		- 50 x (SUM[1 to # red tokens left](vertical index for the current red token visited))
 	*/
+	
 
-	// Vertical/Horizontal Indexes values for each color
-	int verticalGreenVal = 0, verticalRedVal = 0, horizontalGreenVal = 0, horizontalRedVal = 0;
+	// The heuristic
+	/*
+	Black Cells = 2x // Diagonals moves
+	White Cells = 1x // No diagonal moves
+	For each cell, check if it has adjacent of the same color.
+		 If R has R beside, +2 for each
+		 If G has G beside, -2 for each
+	*/
 
-	for (int i = 0; i < MAX_BOARD_SIZE; i++){
-		if (tempBoard[i] == 'G'){
-			/*visitedGreen--;*/
-			verticalGreenVal += getColumnIndex(i);
-			horizontalGreenVal += getRowIndex(i);
+	int totalHeuristic = 0;
+	int tokenValue = 10;
+	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+		//Checks if black cell or white cell
+		if (i % 2 == 0) { // black square
+			if (tempBoard[i] == 'G') {
+				totalHeuristic += tokenValue * 2;
+				//Check the adjacent of the tokens
+				for (int j = 0; j < adjacentCells[i].size(); j++) {
+					if (tempBoard[adjacentCells[i].at(j)] == 'G') {
+						totalHeuristic -= 2;
+					}
+				}
+			}
+			if (tempBoard[i] == 'R') {
+				totalHeuristic -= tokenValue * 2;
+				for (int j = 0; j < adjacentCells[i].size(); j++) {
+					if (tempBoard[adjacentCells[i].at(j)] == 'R') {
+						totalHeuristic += 2;
+					}
+				}
+			}
 		}
-		if (tempBoard[i] == 'R'){
-			//visitedRed--;
-			verticalRedVal += getColumnIndex(i);
-			horizontalRedVal += getRowIndex(i);
+		else { // white square
+			if (tempBoard[i] == 'G') {
+				totalHeuristic += tokenValue;
+				//Check the adjacent of the tokens
+				for (int j = 0; j < adjacentCells[i].size(); j++) {
+					if (tempBoard[adjacentCells[i].at(j)] == 'G') {
+						totalHeuristic -= 2;
+					}
+				}
+			}
+			if (tempBoard[i] == 'R') {
+				totalHeuristic -= tokenValue;
+				for (int j = 0; j < adjacentCells[i].size(); j++) {
+					if (tempBoard[adjacentCells[i].at(j)] == 'R') {
+						totalHeuristic += 2;
+					}
+				}
+			}
 		}
 	}
-	
-	// Return the heuristic value
-	return (HEURISTIC_MULTIPLIER_100 * horizontalGreenVal) + (HEURISTIC_MULTIPLIER_50 * verticalGreenVal) - (HEURISTIC_MULTIPLIER_100 * horizontalRedVal) - (HEURISTIC_MULTIPLIER_50 * verticalRedVal);
+	return totalHeuristic;
+
+
+
+	//// Vertical/Horizontal Indexes values for each color
+	//int verticalGreenVal = 0, verticalRedVal = 0, horizontalGreenVal = 0, horizontalRedVal = 0;
+	//for (int i = 0; i < MAX_BOARD_SIZE; i++){
+	//	if (tempBoard[i] == 'G'){
+	//		/*visitedGreen--;*/
+	//		verticalGreenVal += getColumnIndex(i);
+	//		horizontalGreenVal += getRowIndex(i);
+	//	}
+	//	if (tempBoard[i] == 'R'){
+	//		//visitedRed--;
+	//		verticalRedVal += getColumnIndex(i);
+	//		horizontalRedVal += getRowIndex(i);
+	//	}
+	//}
+	//
+	//// Return the heuristic value
+	//return (HEURISTIC_MULTIPLIER_100 * horizontalGreenVal) + (HEURISTIC_MULTIPLIER_50 * verticalGreenVal) - (HEURISTIC_MULTIPLIER_100 * horizontalRedVal) - (HEURISTIC_MULTIPLIER_50 * verticalRedVal);
 }
 
 // Takes in a board index and returns its row index # (i.e. 27 returns 4 since D = 4)
