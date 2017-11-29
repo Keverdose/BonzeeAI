@@ -443,7 +443,6 @@ bool IsValidChoice(string choice) {
 	return false;
 }
 
-
 // Method to change the coordinates to arrayIndex
 int BoardToIndex(string choice) {
 	char row = choice.at(0);
@@ -737,13 +736,6 @@ void attacking(Move inputMove, char* currentBoard) {
 	}
 }
 
-//// Decrements token count depending on player's turn
-//void tokenCountUpdate() {
-//	if (isPlayerOne) 
-//		redCounter--;    // Decrement red token count
-//	else 
-//		greenCounter--;  // Decrement green token count
-//}
 
 int Heuristic(char* tempBoard) {
 	/*
@@ -763,46 +755,68 @@ int Heuristic(char* tempBoard) {
 	For each cell, check if it has adjacent of the same color.
 		 If R has R beside, +2 for each
 		 If G has G beside, -2 for each
+	IF it's a winning board, and winning for Green, Heuristic = 999999
+	If it's a winning board, and winning for Red, Heuristic = -999999
 	*/
 
 	int totalHeuristic = 0;
 	int tokenValue = 10;
-	for (int i = 0; i < MAX_BOARD_SIZE; i++) {
-		//Checks if black cell or white cell
-		if (i % 2 == 0) { // black square
+	if (winningBoard(tempBoard)) {
+		int gtCount = 0;
+		int rtCount = 0;
+		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
 			if (tempBoard[i] == 'G') {
-				totalHeuristic += tokenValue * 2;
-				//Check the adjacent of the tokens
-				for (int j = 0; j < adjacentCells[i].size(); j++) {
-					if (tempBoard[adjacentCells[i].at(j)] == 'G') {
-						totalHeuristic -= 2;
-					}
-				}
+				gtCount++;
 			}
 			if (tempBoard[i] == 'R') {
-				totalHeuristic -= tokenValue * 2;
-				for (int j = 0; j < adjacentCells[i].size(); j++) {
-					if (tempBoard[adjacentCells[i].at(j)] == 'R') {
-						totalHeuristic += 2;
-					}
-				}
+				rtCount++;
 			}
 		}
-		else { // white square
-			if (tempBoard[i] == 'G') {
-				totalHeuristic += tokenValue;
-				//Check the adjacent of the tokens
-				for (int j = 0; j < adjacentCells[i].size(); j++) {
-					if (tempBoard[adjacentCells[i].at(j)] == 'G') {
-						totalHeuristic -= 2;
+		if (gtCount == 0) {
+			totalHeuristic = 999999;
+		}
+		if (rtCount == 0) {
+			totalHeuristic = -999999;
+		}
+	}
+	else {
+		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+			//Checks if black cell or white cell
+			if (i % 2 == 0) { // black square
+				if (tempBoard[i] == 'G') {
+					totalHeuristic += tokenValue * 2;
+					//Check the adjacent of the tokens
+					for (int j = 0; j < adjacentCells[i].size(); j++) {
+						if (tempBoard[adjacentCells[i].at(j)] == 'G') {
+							totalHeuristic -= 2;
+						}
+					}
+				}
+				if (tempBoard[i] == 'R') {
+					totalHeuristic -= tokenValue * 2;
+					for (int j = 0; j < adjacentCells[i].size(); j++) {
+						if (tempBoard[adjacentCells[i].at(j)] == 'R') {
+							totalHeuristic += 2;
+						}
 					}
 				}
 			}
-			if (tempBoard[i] == 'R') {
-				totalHeuristic -= tokenValue;
-				for (int j = 0; j < adjacentCells[i].size(); j++) {
-					if (tempBoard[adjacentCells[i].at(j)] == 'R') {
-						totalHeuristic += 2;
+			else { // white square
+				if (tempBoard[i] == 'G') {
+					totalHeuristic += tokenValue;
+					//Check the adjacent of the tokens
+					for (int j = 0; j < adjacentCells[i].size(); j++) {
+						if (tempBoard[adjacentCells[i].at(j)] == 'G') {
+							totalHeuristic -= 2;
+						}
+					}
+				}
+				if (tempBoard[i] == 'R') {
+					totalHeuristic -= tokenValue;
+					for (int j = 0; j < adjacentCells[i].size(); j++) {
+						if (tempBoard[adjacentCells[i].at(j)] == 'R') {
+							totalHeuristic += 2;
+						}
 					}
 				}
 			}
