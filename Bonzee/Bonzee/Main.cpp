@@ -31,8 +31,9 @@ static const int HEURISTIC_MULTIPLIER_50 = 50;
 static const int depth = 3; 
 
 // Counters
-//static int greenCounter = MAX_PIECES_NUM;
-//static int redCounter   = MAX_PIECES_NUM;
+static int greenCounter = MAX_PIECES_NUM;
+static int redCounter   = MAX_PIECES_NUM;
+static int tieCounter = 0;
 
 // Booleans
 static bool isPlayerOne = true;
@@ -126,8 +127,33 @@ int main() {
 		PrintBoard();
 		ProcessMoveRequest();
 		isPlayerOne = !isPlayerOne;
+
+		//Loops through the board to check if any tokens were attacked.
+		int greenTokens = 0;
+		int redTokens = 0;
+		for (int i = 0; i < MAX_BOARD_SIZE; i++) {
+			if (board[i] == 'G') {
+				greenTokens++;
+			}
+			if (board[i] == 'R') {
+				redTokens++;
+			}
+		}
+		if (greenTokens == greenCounter && redTokens == redCounter) {
+			tieCounter++;
+			if (tieCounter == 10) {
+				cout << "The game is a tie" << endl;
+				break;
+			}
+		}
+		else {
+			tieCounter = 0;
+			greenCounter = greenTokens;
+			redCounter = redTokens;
+		}
 		// cin.get();
 		cout << "Current Board Heuristic: " << Heuristic(board) << endl;
+		cout << "Tie counter = " << tieCounter << endl;
 	}
 
 	// Post Game Display
